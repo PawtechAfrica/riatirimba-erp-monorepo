@@ -1,0 +1,29 @@
+| Use Case              | Method | Endpoint                              | Description                                      |
+|-----------------------|--------|---------------------------------------|--------------------------------------------------|
+| 🔹 Public Website     | GET    | /api/departments                      | List all departments                             |
+|                       | GET    | /api/departments/:id/courses          | List courses in a department                     |
+|                       | GET    | /api/courses/:id                      | Get course details                               |
+|                       | GET    | /api/courses/:id/full                 | Get course with modules + units (optional)       |
+
+| 🔹 Student Portal     | GET    | /api/students/:id/course              | Get student's course info                        |
+|                       | GET    | /api/courses/:id/modules              | List modules for a course                        |
+|                       | GET    | /api/modules/:id/units                | List units in a module                           |
+
+| 🔹 Admission Portal   | GET    | /api/departments                      | List departments for dropdown                    |
+|                       | GET    | /api/departments/:id/courses          | List courses by department                       |
+
+| 🔹 Admin - Departments| POST   | /api/departments                      | Add new department                               |
+|                       | PUT    | /api/departments/:id                  | Edit department info                             |
+|                       | DELETE | /api/departments/:id                  | Delete department                                |
+
+| 🔹 Admin - Courses    | POST   | /api/courses                          | Add new course                                   |
+|                       | PUT    | /api/courses/:id                      | Edit course                                       |
+|                       | DELETE | /api/courses/:id                      | Delete course                                     |
+
+| 🔹 Admin - Modules    | POST   | /api/modules                          | Add new module                                   |
+|                       | PUT    | /api/modules/:id                      | Edit module                                      |
+|                       | DELETE | /api/modules/:id                      | Delete module                                    |
+
+| 🔹 Admin - Units      | POST   | /api/units                            | Add new unit                                     |
+|                       | PUT    | /api/units/:id                        | Edit unit                                        |
+|                       | DELETE | /api/units/:id                        | Delete unit                                      |

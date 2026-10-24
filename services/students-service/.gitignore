@@ -1,0 +1,7 @@
+.env
+.idea/
+.zed/
+.code/
+dist
+node_modules
+/user_downloads

@@ -1,0 +1,107 @@
+#version: '3.8'
+
+services:
+
+  # - Housekeeping service 
+  housekeeping-service:
+    container_name: housekeeping-service
+    build: .
+    restart: unless-stopped
+    environment:
+    #- DOCKER_HOST= npipe:////./pipe/docker_engine (windows environment)
+    env_file:
+      - .env
+    volumes:
+      - backups:/app/backups
+      - /var/run/docker.sock:/var/run/docker.sock   # Linux
+     # - //./pipe/docker_engine://./pipe/docker_engine # Windows
+      - ./rclone.conf:/root/.config/rclone/rclone.conf:ro
+    networks:
+      - backend
+    depends_on:
+      academics-database:
+          condition: service_healthy
+      admission-database:
+          condition: service_healthy
+      students-database:
+          condition: service_healthy
+      auth-database:
+          condition: service_healthy
+
+  # ── PostgreSQL: academics
+  academics-database:
+    container_name: academics-database
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${ACADEMICS_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${ACADEMICS_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - backend
+
+  # ── PostgreSQL: admission 
+  admission-database:
+    container_name: admission-database
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${ADMISSION_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${ADMISSION_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - backend
+
+  # ── PostgreSQL: students 
+  students-database:
+    container_name: students-database
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${STUDENTS_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${STUDENTS_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - backend
+
+  # ── MySQL: auth 
+  auth-database:
+    container_name: auth-database
+    image: mysql:8-debian
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s 
+    networks:
+      - backend
+
+volumes:
+  backups:
+
+networks:
+  backend:
+    driver: bridge

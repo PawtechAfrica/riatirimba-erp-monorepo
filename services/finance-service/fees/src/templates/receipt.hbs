@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Fee Receipt</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #fff;
+      padding: 40px;
+      color: #333;
+    }
+    .receipt {
+      max-width: 800px;
+      margin: 0 auto;
+      border: 1px solid #ddd;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #1a5276;
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+    }
+    .header-left h1 {
+      color: #1a5276;
+      font-size: 24px;
+    }
+    .header-left p {
+      color: #666;
+      font-size: 12px;
+    }
+    .header-right {
+      text-align: right;
+    }
+    .header-right .receipt-number {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1a5276;
+    }
+    .header-right .date {
+      color: #666;
+      font-size: 14px;
+    }
+    .student-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+    }
+    .student-info .label {
+      color: #666;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .student-info .value {
+      color: #333;
+      font-size: 14px;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .summary-box {
+      background: #f8f9fa;
+      padding: 15px;
+      text-align: center;
+      border-radius: 4px;
+    }
+    .summary-box .label {
+      font-size: 12px;
+      color: #666;
+    }
+    .summary-box .amount {
+      font-size: 20px;
+      font-weight: bold;
+      color: #1a5276;
+    }
+    .summary-box .amount.positive { color: #27ae60; }
+    .summary-box .amount.negative { color: #e74c3c; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th {
+      background: #1a5276;
+      color: #fff;
+      padding: 10px;
+      text-align: left;
+      font-size: 13px;
+    }
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+    }
+    tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .status-badge.cleared { background: #d4edda; color: #155724; }
+    .status-badge.partial { background: #fff3cd; color: #856404; }
+    .status-badge.unpaid { background: #f8d7da; color: #721c24; }
+    .status-badge.overpaid { background: #cce5ff; color: #004085; }
+    .total-row {
+      font-weight: bold;
+      background: #e8f4fd;
+    }
+    .total-row td {
+      border-top: 2px solid #1a5276;
+    }
+    .footer {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+    }
+    .footer .powered {
+      color: #1a5276;
+      font-weight: bold;
+    }
+    @media print {
+      body { padding: 0; }
+      .receipt { border: none; box-shadow: none; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <h1>Riatirimba College</h1>
+        <p>Technical and Vocational College</p>
+        <p>P.O. Box 123, Riatirimba</p>
+      </div>
+      <div class="header-right">
+        <div class="receipt-number">#{{receiptNumber}}</div>
+        <div class="date">Date: {{generatedDate}}</div>
+        <div class="date">Payment Date: {{paymentDate}}</div>
+      </div>
+    </div>
+
+    <!-- Student Info -->
+    <div class="student-info">
+      <div><span class="label">Student ID:</span> <span class="value">{{studentId}}</span></div>
+      <div><span class="label">Programme:</span> <span class="value">{{programmeCode}}</span></div>
+      <div><span class="label">Academic Year:</span> <span class="value">{{studentYear}}</span></div>
+      <div><span class="label">Term:</span> <span class="value">{{studentTerm}}</span></div>
+      <div><span class="label">Obligation Type:</span> <span class="value">{{obligationType}}</span></div>
+      <div><span class="label">Fee Version:</span> <span class="value">{{feeVersion}}</span></div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary">
+      <div class="summary-box">
+        <div class="label">Total Assessed</div>
+        <div class="amount">{{totalAmount}}</div>
+      </div>
+      <div class="summary-box">
+        <div class="label">Total Paid</div>
+        <div class="amount positive">{{totalPaid}}</div>
+      </div>
+      <div class="summary-box">
+        <div class="label">Balance</div>
+        <div class="amount {{#if isOverpaid}}negative{{else}}positive{{/if}}">{{totalBalance}}</div>
+      </div>
+    </div>
+
+    <!-- Vote Head Breakdown -->
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Vote Head</th>
+          <th style="text-align:right;">Assessed (KES)</th>
+          <th style="text-align:right;">Paid (KES)</th>
+          <th style="text-align:right;">Balance (KES)</th>
+          <th style="text-align:center;">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each voteHeads}}
+        <tr>
+          <td>{{@index}}</td>
+          <td>{{name}}</td>
+          <td style="text-align:right;">{{assessed}}</td>
+          <td style="text-align:right;">{{paid}}</td>
+          <td style="text-align:right;">{{balance}}</td>
+          <td style="text-align:center;">
+            <span class="status-badge {{status}}">{{status}}</span>
+          </td>
+        </tr>
+        {{/each}}
+        <tr class="total-row">
+          <td colspan="2"><strong>TOTAL</strong></td>
+          <td style="text-align:right;"><strong>{{totalAmount}}</strong></td>
+          <td style="text-align:right;"><strong>{{totalPaid}}</strong></td>
+          <td style="text-align:right;"><strong>{{totalBalance}}</strong></td>
+          <td style="text-align:center;">
+            <span class="status-badge {{status}}">{{status}}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Payment Details -->
+    {{#if payments.length}}
+    <h4 style="margin: 20px 0 10px 0; color: #1a5276;">Payment History</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Receipt</th>
+          <th>Date</th>
+          <th>Mode</th>
+          <th style="text-align:right;">Amount (KES)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each payments}}
+        <tr>
+          <td>{{receiptNumber}}</td>
+          <td>{{paymentDate}}</td>
+          <td>{{paymentMode}}</td>
+          <td style="text-align:right;">{{amount}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{/if}}
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>This is a system-generated receipt. Please keep for your records.</p>
+      <p class="powered">Riatirimba Finance System v1.0</p>
+    </div>
+  </div>
+</body>
+</html>

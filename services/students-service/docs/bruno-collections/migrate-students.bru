@@ -1,0 +1,105 @@
+meta {
+  name: migrate-students
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{address}}/students/create-many
+  body: json
+  auth: inherit
+}
+
+body:json {
+  [
+    {
+      "firstName": "Lawrence",
+      "middleName": "Odi",
+      "lastName": "Tsungu",
+      "email": "tsungulawrence@gmail.com",
+      "phone": "+254719702831",
+      "idType": "nationalId",
+      "idNumber": "12345678",
+      "gender": "M",
+      "pinNumber": null,
+      "address": {
+        "id": 1,
+        "zipCode": 40200,
+        "poBox": 74,
+        "county": "KISII",
+        "location": "Sansora",
+        "subLocation": "Sansora",
+        "village": "Sansora"
+      },
+      "academicHistory": {
+        "id": 1,
+        "highestEducationLevel": "secondary",
+        "kcseIndexNumber": "48012940839/8556",
+        "kcpeIndexNumber": "40735253001/2017",
+        "primarySchool": "Manguo Primary",
+        "highSchool": "Maranda H",
+        "tertiaryLevel": null,
+        "tertiarySchool": null,
+        "kcseGrade": "B+"
+      },
+      "submitted": false,
+      "nextOfKins": [
+        {
+          "id": "1",
+          "firstName": "Mary",
+          "lastName": "Nyami",
+          "phone": "+254720945737",
+          "email": "mary@gmail.com",
+          "relationship": "Mother",
+          "applicant": "533e264a-f0cf-409f-ad18-2637e2d4decc"
+        },
+        {
+          "id": "2",
+          "firstName": "Lery",
+          "lastName": "Tsungu",
+          "phone": "+254719702833",
+          "email": "lery@gmail.com",
+          "relationship": "Father",
+          "applicant": "533e264a-f0cf-409f-ad18-2637e2d4decc"
+        }
+      ],
+      "enrollments": [
+        {
+          "course": 14,
+          "intake": "MAY-2025",
+          "newApplicant": false,
+          "admissionNumber": "ENE221-0129/2022",
+          "yearOfStudy": 3,
+          "examiningBody": "CDACC",
+          "studentType": "KUCCPS",
+          "createdAt": "2025-10-16T00:00:00.000Z",
+          "applicant": {},
+          "id": 1
+        }
+      ],
+      "documents": [
+        {
+          "documentKey": "kcseCertificate",
+          "url": "0e4b9440-914c-4bcd-9718-bf46311ddb06-lawre_ngotho.pdf"
+        },
+        {
+          "documentKey": "kcpeCertificate",
+          "url": "127f8360-261a-40b9-bb3b-d5600739756e-PLC-YJUNV7P-RECEIPT.pdf"
+        },
+        {
+          "documentKey": "birthCertificate",
+          "url": "dfe3213e-7054-4fb3-9f4e-d5ef0fee48d7-lawre_ngotho.pdf"
+        },
+        {
+          "documentKey": "passportPhoto",
+          "url": "228d8b44-7509-40d7-90b4-e94109731e37-my passport photo.jpg"
+        }
+      ]
+    }
+  ]
+  
+}
+
+settings {
+  encodeUrl: true
+}

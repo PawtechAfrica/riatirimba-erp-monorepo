@@ -1,0 +1,19 @@
+meta {
+  name: (latest)get-and-query
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{address}}/intakes/all/?year=2025
+  body: none
+  auth: inherit
+}
+
+params:query {
+  year: 2025
+}
+
+settings {
+  encodeUrl: true
+}

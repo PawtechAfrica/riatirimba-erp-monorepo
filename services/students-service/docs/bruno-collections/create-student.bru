@@ -1,0 +1,54 @@
+meta {
+  name: create-student
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{address}}/students/new
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "firstName": "Derek",
+    "lastName": "Pesa",
+    "email": "pesaderek1738@gmail.com",
+    "phone": "+254741120439",
+    "idType": "nationalId",
+    "idNumber": "39034380",
+    "gender": "M",
+    "birthday": "30 March 2001",
+    "newApplicant": true,
+    "address": {
+      "poBox": 50,
+      "zipCode": 4050,
+      "county": "Kakamega",
+      "location": "Lurende",
+      "subLocation": "Lurende",
+      "village": "Sokomoko"
+    },
+    "nextOfKins": [
+      {
+        "firstName": "",
+        "lastName": "",
+        "phone": "",
+        "relationship": ""
+      }
+    ],
+    "academicHistory": {
+      "highestEducationLevel": "secondary",
+      "kcpeIndexNumber": "12345678901/2015",
+      "primarySchool": "St.Stephen's ACK",
+      "highSchool": "",
+      "kcseIndexNumber": "",
+      "kcseGrade": ""
+    },
+    "enrollments": []
+  }
+}
+
+settings {
+  encodeUrl: true
+}

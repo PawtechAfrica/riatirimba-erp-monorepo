@@ -1,0 +1,67 @@
+{
+    "name": "@erp/sdk",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "sideEffects": false,
+    "imports": {
+        "#shared/*": "./src/shared/*",
+        "#server/*": "./src/server/*",
+        "#frontend/*": "./src/frontend/*"
+    },
+    "exports": {
+        "./shared/schemas": {
+            "types": "./dist/shared/schemas/index.d.ts",
+            "import": "./dist/shared/schemas/index.js",
+            "require": "./dist/shared/schemas/index.cjs"
+        },
+        "./shared/formatters": {
+            "types": "./dist/shared/formatters/index.d.ts",
+            "import": "./dist/shared/formatters/index.js",
+            "require": "./dist/shared/formatters/index.cjs"
+        },
+        "./shared/enums": {
+            "types": "./dist/shared/enums/index.d.ts",
+            "import": "./dist/shared/enums/index.js",
+            "require": "./dist/shared/enums/index.cjs"
+        },
+        "./shared/types": {
+            "types": "./dist/shared/types/index.d.ts",
+            "import": "./dist/shared/types/index.js",
+            "require": "./dist/shared/types/index.cjs"
+        },
+        "./shared/utils": {
+            "types": "./dist/shared/utils/index.d.ts",
+            "import": "./dist/shared/utils/index.js",
+            "require": "./dist/shared/utils/index.cjs"
+        },
+        "./server/http": {
+            "types": "./dist/server/http/index.d.ts",
+            "import": "./dist/server/http/index.js",
+            "require": "./dist/server/http/index.cjs"
+        },
+        "./server/logging": {
+            "types": "./dist/server/logging/index.d.ts",
+            "import": "./dist/server/logging/index.js",
+            "require": "./dist/server/logging/index.cjs"
+        },
+        "./frontend/utils": {
+            "types": "./dist/frontend/utils/index.d.ts",
+            "import": "./dist/frontend/utils/index.js",
+            "require": "./dist/frontend/utils/index.cjs"
+        }
+    },
+    "scripts": {
+        "build": "tsup",
+        "dev": "tsup --watch"
+    },
+    "dependencies": {},
+    "peerDependencies": {
+        "zod": "^4.4.3"
+    },
+    "devDependencies": {
+        "tsup": "^8.5.1",
+        "typescript": "^5.5.4",
+        "zod": "^4.4.3"
+    }
+}

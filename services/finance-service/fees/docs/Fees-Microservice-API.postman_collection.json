@@ -1,0 +1,1020 @@
+{
+  "info": {
+    "name": "Riatirimba Finance Service API",
+    "description": "Complete API collection for Riatirimba College Finance Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "feeStructureId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "voteHeadId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "enrollmentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "obligationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "paymentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "regNo",
+      "value": "2026-ICT-001",
+      "type": "string"
+    },
+    {
+      "key": "studentName",
+      "value": "John Mwangi",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/../health",
+              "host": ["{{baseUrl}}"],
+              "path": ["..", "health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "1. Vote Heads",
+      "item": [
+        {
+          "name": "Get All Vote Heads",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vote-heads",
+              "host": ["{{baseUrl}}"],
+              "path": ["vote-heads"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get One-Time Charges",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vote-heads/one-time",
+              "host": ["{{baseUrl}}"],
+              "path": ["vote-heads", "one-time"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Recurring Charges",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vote-heads/recurring",
+              "host": ["{{baseUrl}}"],
+              "path": ["vote-heads", "recurring"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Vote Head by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vote-heads/VH-ACT",
+              "host": ["{{baseUrl}}"],
+              "path": ["vote-heads", "VH-ACT"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Vote Head",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"VH-TEST\",\n  \"name\": \"Test Vote Head\",\n  \"description\": \"Created for testing\",\n  \"is_one_time\": false,\n  \"is_refundable\": false,\n  \"priority_order\": 99,\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vote-heads",
+              "host": ["{{baseUrl}}"],
+              "path": ["vote-heads"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Vote Head",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Test Vote Head\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vote-heads/VH-TEST",
+              "host": ["{{baseUrl}}"],
+              "path": ["vote-heads", "VH-TEST"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Vote Head Status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vote-heads/VH-TEST/toggle",
+              "host": ["{{baseUrl}}"],
+              "path": ["vote-heads", "VH-TEST", "toggle"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Vote Head",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vote-heads/VH-TEST",
+              "host": ["{{baseUrl}}"],
+              "path": ["vote-heads", "VH-TEST"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Fee Structures",
+      "item": [
+        {
+          "name": "Get All Fee Structures",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fee-structures",
+              "host": ["{{baseUrl}}"],
+              "path": ["fee-structures"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Fee Structures",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fee-structures/active?term_number=1&date=2026-09-05",
+              "host": ["{{baseUrl}}"],
+              "path": ["fee-structures", "active"],
+              "query": [
+                {
+                  "key": "term_number",
+                  "value": "1"
+                },
+                {
+                  "key": "date",
+                  "value": "2026-09-05"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Fee Structure by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fee-structures/FS-V1-T1-COL",
+              "host": ["{{baseUrl}}"],
+              "path": ["fee-structures", "FS-V1-T1-COL"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Fee Structure Versions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fee-structures/versions",
+              "host": ["{{baseUrl}}"],
+              "path": ["fee-structures", "versions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Fee Structure",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"version_label\": \"2026 Gazette\",\n  \"term_number\": 1,\n  \"scope_type\": \"college\",\n  \"scope_id\": null,\n  \"student_category\": null,\n  \"valid_from\": \"2026-01-01\",\n  \"valid_to\": null,\n  \"total_amount\": 22398.00,\n  \"created_by\": \"ADMIN-01\",\n  \"lines\": [\n    {\"vote_head_id\": \"VH-ACT\", \"amount\": 1600.00, \"priority_order\": 5},\n    {\"vote_head_id\": \"VH-EWC\", \"amount\": 1324.00, \"priority_order\": 6},\n    {\"vote_head_id\": \"VH-LTT\", \"amount\": 1400.00, \"priority_order\": 7},\n    {\"vote_head_id\": \"VH-PE\", \"amount\": 3500.00, \"priority_order\": 8},\n    {\"vote_head_id\": \"VH-RMI\", \"amount\": 1334.00, \"priority_order\": 9},\n    {\"vote_head_id\": \"VH-TUI\", \"amount\": 13240.00, \"priority_order\": 10}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/fee-structures",
+              "host": ["{{baseUrl}}"],
+              "path": ["fee-structures"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Bulk Create Fee Structures",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"version_label\": \"2027 Gazette\",\n  \"valid_from\": \"2027-08-01\",\n  \"valid_to\": null,\n  \"created_by\": \"ADMIN-01\",\n  \"terms\": [\n    {\n      \"term_number\": 1,\n      \"total_amount\": 24000.00,\n      \"lines\": [\n        {\"vote_head_id\": \"VH-ACT\", \"amount\": 1700.00, \"priority_order\": 5}\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/fee-structures/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["fee-structures", "bulk"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resolve Fee Structure",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"term_number\": 1,\n  \"enrollment_date\": \"2026-09-05\",\n  \"programme_code\": \"DICT\",\n  \"department_id\": \"DEPT-ICT\",\n  \"student_category\": \"regular\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/fee-structures/resolve",
+              "host": ["{{baseUrl}}"],
+              "path": ["fee-structures", "resolve"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Close Fee Structure Version",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valid_to\": \"2027-07-31\",\n  \"closedBy\": \"ADMIN-01\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/fee-structures/FS-V1-T1-COL/close",
+              "host": ["{{baseUrl}}"],
+              "path": ["fee-structures", "FS-V1-T1-COL", "close"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Copy Fee Structure Version",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"new_valid_from\": \"2027-08-01\",\n  \"version_label\": \"2027 Gazette Copy\",\n  \"created_by\": \"ADMIN-01\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/fee-structures/FS-V1-T1-COL/copy",
+              "host": ["{{baseUrl}}"],
+              "path": ["fee-structures", "FS-V1-T1-COL", "copy"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Fee Structure",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/fee-structures/FS-V1-T1-COL",
+              "host": ["{{baseUrl}}"],
+              "path": ["fee-structures", "FS-V1-T1-COL"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Enrollments",
+      "item": [
+        {
+          "name": "Process Enrollment (New Student)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"TERM_ADVANCED\",\n  \"eventId\": \"EVT-001\",\n  \"studentRegNo\": \"{{regNo}}\",\n  \"studentName\": \"{{studentName}}\",\n  \"programmeCode\": \"DICT\",\n  \"studentYear\": 1,\n  \"studentTerm\": 1,\n  \"enrollmentDate\": \"2026-09-05\",\n  \"studentCategory\": \"regular\",\n  \"isNewStudent\": true,\n  \"enrolledBy\": \"HOD-001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enrollment-events",
+              "host": ["{{baseUrl}}"],
+              "path": ["enrollment-events"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Process Enrollment (Returning Student - Term 2)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"TERM_ADVANCED\",\n  \"eventId\": \"EVT-002\",\n  \"studentRegNo\": \"{{regNo}}\",\n  \"studentName\": \"{{studentName}}\",\n  \"programmeCode\": \"DICT\",\n  \"studentYear\": 1,\n  \"studentTerm\": 2,\n  \"enrollmentDate\": \"2027-01-10\",\n  \"studentCategory\": \"regular\",\n  \"isNewStudent\": false,\n  \"enrolledBy\": \"HOD-001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enrollment-events",
+              "host": ["{{baseUrl}}"],
+              "path": ["enrollment-events"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Process Student Withdrawal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"STUDENT_WITHDRAWN\",\n  \"eventId\": \"EVT-003\",\n  \"studentRegNo\": \"{{regNo}}\",\n  \"studentName\": \"{{studentName}}\",\n  \"programmeCode\": \"DICT\",\n  \"studentYear\": 1,\n  \"studentTerm\": 1,\n  \"enrollmentDate\": \"2026-09-15\",\n  \"studentCategory\": \"regular\",\n  \"isNewStudent\": false,\n  \"enrolledBy\": \"HOD-001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enrollment-events",
+              "host": ["{{baseUrl}}"],
+              "path": ["enrollment-events"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Enrollments by Reg No",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enrollments?regNo={{regNo}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["enrollments"],
+              "query": [
+                {
+                  "key": "regNo",
+                  "value": "{{regNo}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Enrollment by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enrollments/{{enrollmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["enrollments", "{{enrollmentId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Enrollment Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\",\n  \"notes\": \"Student completed the term\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enrollments/{{enrollmentId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["enrollments", "{{enrollmentId}}", "status"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Payments",
+      "item": [
+        {
+          "name": "Post Partial Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"regNo\": \"{{regNo}}\",\n  \"obligations\": [\n    {\n      \"obligationId\": \"{{obligationId}}\",\n      \"amount\": 20000\n    }\n  ],\n  \"totalAmount\": 20000,\n  \"paymentMode\": \"mpesa\",\n  \"transactionRef\": \"PAY-001\",\n  \"fundingSource\": \"self\",\n  \"receivedBy\": \"CASHIER-01\",\n  \"paymentDate\": \"2026-09-10\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Post Full Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"regNo\": \"{{regNo}}\",\n  \"obligations\": [\n    {\n      \"obligationId\": \"{{obligationId}}\",\n      \"amount\": 22398\n    }\n  ],\n  \"totalAmount\": 22398,\n  \"paymentMode\": \"mpesa\",\n  \"transactionRef\": \"PAY-002\",\n  \"fundingSource\": \"self\",\n  \"receivedBy\": \"CASHIER-01\",\n  \"paymentDate\": \"2026-09-10\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Payments by Reg No",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/payments?regNo={{regNo}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments"],
+              "query": [
+                {
+                  "key": "regNo",
+                  "value": "{{regNo}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Payment by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/payments/{{paymentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments", "{{paymentId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reverse Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reversedBy\": \"ADMIN-01\",\n  \"notes\": \"Payment made in error\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments/{{paymentId}}/reverse",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments", "{{paymentId}}", "reverse"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Receipts",
+      "item": [
+        {
+          "name": "Generate Student Receipt (PDF)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/receipts/{{obligationId}}/pdf?type=student",
+              "host": ["{{baseUrl}}"],
+              "path": ["receipts", "{{obligationId}}", "pdf"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "student"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Sponsor Receipt (PDF)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/receipts/{{obligationId}}/pdf?type=sponsor",
+              "host": ["{{baseUrl}}"],
+              "path": ["receipts", "{{obligationId}}", "pdf"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "sponsor"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Receipt JSON Preview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/receipts/{{obligationId}}/json",
+              "host": ["{{baseUrl}}"],
+              "path": ["receipts", "{{obligationId}}", "json"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Students",
+      "item": [
+        {
+          "name": "Get Student Fee Position",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/students/fee-position?regNo={{regNo}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "fee-position"],
+              "query": [
+                {
+                  "key": "regNo",
+                  "value": "{{regNo}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Student Fee Position (with Year)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/students/fee-position?regNo={{regNo}}&studentYear=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "fee-position"],
+              "query": [
+                {
+                  "key": "regNo",
+                  "value": "{{regNo}}"
+                },
+                {
+                  "key": "studentYear",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Student Fee Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/students/summary?regNo={{regNo}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "summary"],
+              "query": [
+                {
+                  "key": "regNo",
+                  "value": "{{regNo}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Reports",
+      "item": [
+        {
+          "name": "Get Daily Collection",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/daily-collection?date=2026-09-06",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "daily-collection"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-09-06"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Weekly Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/weekly-summary?weekStart=2026-09-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "weekly-summary"],
+              "query": [
+                {
+                  "key": "weekStart",
+                  "value": "2026-09-01"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Monthly Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/monthly-summary?year=2026&month=9",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "monthly-summary"],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2026"
+                },
+                {
+                  "key": "month",
+                  "value": "9"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Programme Collection",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/programme-collection?startDate=2026-09-01&endDate=2026-09-30",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "programme-collection"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2026-09-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-09-30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Aging Report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/aging",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "aging"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Collection Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/collection-summary?startDate=2026-09-01&endDate=2026-09-30",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "collection-summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2026-09-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-09-30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Outstanding Balances",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/outstanding",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "outstanding"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "8. Audit Logs",
+      "item": [
+        {
+          "name": "Get All Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs?limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Audit Logs with Filters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs?entity_type=Payment&action=POST&start_date=2026-09-01&end_date=2026-09-30",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs"],
+              "query": [
+                {
+                  "key": "entity_type",
+                  "value": "Payment"
+                },
+                {
+                  "key": "action",
+                  "value": "POST"
+                },
+                {
+                  "key": "start_date",
+                  "value": "2026-09-01"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2026-09-30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Audit Logs by User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs/user/ADMIN-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs", "user", "ADMIN-01"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Audit Logs by Entity",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs/entity/Payment/{{paymentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs", "entity", "Payment", "{{paymentId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Audit Log Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Recent Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs/recent?limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs", "recent"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cleanup Old Audit Logs",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs/cleanup?days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs", "cleanup"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Audit Log by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs/AUD-xxxxx",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs", "AUD-xxxxx"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

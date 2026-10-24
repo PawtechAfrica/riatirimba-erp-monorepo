@@ -1,0 +1,385 @@
+services:
+  # --------------------------------------------------
+  # VALKEY - REDIS FORK
+  # --------------------------------------------------
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: valkey
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - valkey_data:/data
+    command: valkey-server --requirepass TheRiseOfValkey
+    networks:
+      - college-mis-network
+
+  # --------------------------------------------------
+  # REVERSE PROXY - NGINX
+  # --------------------------------------------------
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx_proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt/live/api.riatirimbatvc.ac.ke/fullchain.pem:/etc/nginx/certs/fullchain.pem:ro
+      - /etc/letsencrypt/live/api.riatirimbatvc.ac.ke/privkey.pem:/etc/nginx/certs/privkey.pem:ro
+      - ./Nginx/html:/etc/nginx/html
+    depends_on:
+      - admission-service
+      - academics-service
+      - filegate-service
+      - auth-service
+      - students-service
+    networks:
+      - college-mis-network
+
+  # --------------------------------------------------
+  # BACKUP SERVICE
+  # --------------------------------------------------
+  backup-service:
+    image: pawtechlabs/erp-backup-service:9193e3c
+    container_name: backup-service
+    env_file: ./backup-service/.env.backup
+    volumes:
+      - ./backup-service/backups:/app/backups
+      - ./backup-service/dbs.json:/app/dbs.json
+      - ./backup-service/rclone.conf:/root/.config/rclone/rclone.conf
+    networks:
+      - college-mis-network
+    restart: always
+
+  # --------------------------------------------------
+  # ACADEMICS DATABASE
+  # --------------------------------------------------
+  academics-database:
+    image: postgres:16
+    container_name: academics-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${ACADEMICS_DB_USERNAME}
+      POSTGRES_PASSWORD: ${ACADEMICS_DB_PASSWORD}
+      POSTGRES_DB: ${ACADEMICS_DB_NAME}
+      PGDATA: /var/lib/postgresql/data/
+      POSTGRES_INITDB_ARGS: --encoding=UTF-8
+      POSTGRES_HOST_AUTH_METHOD: md5
+    ports:
+      - "5433:5432"
+    volumes:
+      - academics_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 90s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    networks:
+      - college-mis-network
+
+  # --------------------------------------------------
+  # ACADEMICS SERVICE
+  # --------------------------------------------------
+  academics-service:
+    image: pawtechlabs/erp-academics-service:latest
+    container_name: academics_api
+    env_file:
+      - ./academics-service/.env.academics
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    depends_on:
+      - academics-database
+    networks:
+      - college-mis-network
+
+  # --------------------------------------------------
+  # ADMISSION DATABASE
+  # --------------------------------------------------
+  admission-database:
+    image: postgres:16
+    container_name: admission-database
+    environment:
+      POSTGRES_USER: ${ADMISSION_DB_USERNAME}
+      POSTGRES_PASSWORD: ${ADMISSION_DB_PASSWORD}
+      POSTGRES_DB: ${ADMISSION_DB_NAME}
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_INITDB_ARGS: --encoding=UTF-8
+      POSTGRES_HOST_AUTH_METHOD: md5
+    volumes:
+      - admission_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5444:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 90s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    networks:
+      - college-mis-network
+
+  # --------------------------------------------------
+  # ADMISSION SERVICE
+  # --------------------------------------------------
+  admission-service:
+    image: pawtechlabs/erp-admission-service:e589686
+    container_name: admission_api
+    env_file:
+      - ./admission-service/.env.admission
+    ports:
+      - "5000:5000"
+    restart: on-failure
+    depends_on:
+      - admission-database
+    networks:
+      - college-mis-network
+
+  # --------------------------------------------------
+  # STUDENTS DATABASE
+  # --------------------------------------------------
+  students-database:
+    image: postgres:16
+    container_name: students-database
+    environment:
+      POSTGRES_USER: ${STUDENTS_DB_USERNAME}
+      POSTGRES_PASSWORD: ${STUDENTS_DB_PASSWORD}
+      POSTGRES_DB: ${STUDENTS_DB_NAME}
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_INITDB_ARGS: --encoding=UTF-8
+      POSTGRES_HOST_AUTH_METHOD: md5
+    volumes:
+      - students_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5455:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 90s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    networks:
+      - college-mis-network
+
+  # --------------------------------------------------
+  # STUDENTS SERVICE
+  # --------------------------------------------------
+  students-service:
+    image: pawtechlabs/erp-students-service:7a13cb8
+    container_name: students_api
+    env_file:
+      - ./students-service/.env.students
+    ports:
+      - "5002:5002"
+    restart: on-failure
+    depends_on:
+      - students-database
+    networks:
+      - college-mis-network
+
+  # --------------------------------------------------
+  # AUTH DATABASE
+  # --------------------------------------------------
+  auth-database:
+    image: postgres:16
+    container_name: auth-database
+    restart: always
+    environment:
+      POSTGRES_USER: ${AUTH_DB_USERNAME}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+      POSTGRES_DB: ${AUTH_DB_NAME}
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_INITDB_ARGS: --encoding=UTF-8
+      POSTGRES_HOST_AUTH_METHOD: md5
+    ports:
+      - "5456:5432"
+    volumes:
+      - auth_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 90s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
+    networks:
+      - college-mis-network
+
+  # --------------------------------------------------
+  # AUTH SERVICE
+  # --------------------------------------------------
+  auth-service:
+    image: pawtechlabs/erp-auth-service:4ccf6cd
+    container_name: auth_api
+    restart: always
+    env_file:
+      - ./auth-service/.env.auth
+    ports:
+      - "4000:4000"
+    depends_on:
+      - auth-database
+    networks:
+      - college-mis-network
+
+  # --------------------------------------------------
+  # FILEGATE DATABASE (MYSQL)
+  # --------------------------------------------------
+  filegate-database:
+    image: mysql:8.0
+    container_name: filegate-database
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3308:3306"
+    volumes:
+      - filegate_mysqldata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prootpass"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - college-mis-network
+
+  # --------------------------------------------------
+  # FILEGATE SERVICE
+  # --------------------------------------------------
+  filegate-service:
+    image: pawtechlabs/erp-filegate-service:2925dee
+    container_name: filegate_api
+    restart: always
+    env_file:
+      - ./filegate-service/.env.filegate
+    environment:
+      DB_HOST: filegate-database
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_DIALECT: mysql
+    ports:
+      - "4001:4000"
+    depends_on:
+      - filegate-database
+    networks:
+      - college-mis-network
+
+  voucher-database:
+    image: postgres:16
+    container_name: voucher-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${VOUCHER_DB_USERNAME}
+      POSTGRES_PASSWORD: ${VOUCHER_DB_PASSWORD}
+      POSTGRES_DB: ${VOUCHER_DB_NAME}
+      PGDATA: /var/lib/postgresql/data/
+      POSTGRES_INITDB_ARGS: --encoding=UTF-8
+      POSTGRES_HOST_AUTH_METHOD: md5
+    ports:
+      - "5458:5432"
+    volumes:
+      - voucher_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    networks:
+      - college-mis-network
+
+  voucher-service:
+    image: pawtechlabs/erp-finance-service:bc267f4
+    container_name: voucher_api
+    restart: on-failure
+    env_file:
+      - ./finance-service/voucher/.env.finance
+    environment:
+      VOUCHER_DB_HOST: voucher-database
+      VOUCHER_DB_USERNAME: ${VOUCHER_DB_USERNAME}
+      VOUCHER_DB_PASSWORD: ${VOUCHER_DB_PASSWORD}
+      VOUCHER_DB_NAME: ${VOUCHER_DB_NAME}
+      VOUCHER_DB_DIALECT: postgres
+      PORT: 7000
+    ports:
+      - "7000:7000"
+    depends_on:
+      - voucher-database
+    volumes:
+      - ./finance-service/voucher/assets:/app/assets
+    networks:
+      - college-mis-network
+
+  fees-database:
+    image: postgres:16
+    container_name: fees-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${FEES_DB_USERNAME}
+      POSTGRES_PASSWORD: ${FEES_DB_PASSWORD}
+      POSTGRES_DB: ${FEES_DB_NAME}
+      PGDATA: /var/lib/postgresql/data/
+      POSTGRES_INITDB_ARGS: --encoding=UTF-8
+      POSTGRES_HOST_AUTH_METHOD: md5
+    ports:
+      - "5460:5432"
+    volumes:
+      - fees_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 90s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    networks:
+      - college-mis-network
+
+  # --------------------------------------------------
+  # FEES SERVICE
+  # --------------------------------------------------
+  fees-service:
+    image: pawtechlabs/erp-fees-service:76b8837
+    container_name: fees_api
+    restart: on-failure
+    env_file:
+      - ./finance-service/fees/.env.fees
+    environment:
+      FEES_DB_HOST: fees-database
+      FEES_DB_USERNAME: ${FEES_DB_USERNAME}
+      FEES_DB_PASSWORD: ${FEES_DB_PASSWORD}
+      FEES_DB_NAME: ${FEES_DB_NAME}
+      DB_SYNC_ALTER: "true"
+      DB_SYNC: "true"
+      FEES_DB_DIALECT: postgres
+      PORT: 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - fees-database
+    volumes:
+      - ./finance-service/fees/assets:/app/assets
+    networks:
+      - college-mis-network
+
+# ------------------------------------------------------
+# VOLUMES & NETWORK
+# ------------------------------------------------------
+volumes:
+  academics_pgdata:
+  admission_pgdata:
+  auth_pgdata:
+  filegate_mysqldata:
+  students_pgdata:
+  fees_pgdata:
+  voucher_pgdata:
+  reporting_pgdata:
+  valkey_data:
+
+networks:
+  college-mis-network:
+    driver: bridge

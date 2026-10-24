@@ -1,0 +1,21 @@
+meta {
+  name: approve-applications
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:5000/api/v1/admission/approve-applications
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "applicant_ids": ["f114534d-b276-42ad-9507-58c15412cef3"]
+  }
+}
+
+settings {
+  encodeUrl: true
+}

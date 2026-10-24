@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voucher System</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- SIDEBAR / NAV -->
+  <aside class="sidebar">
+    <div class="logo">📄 VoucherSys</div>
+    <nav>
+      <button class="nav-btn active" onclick="showTab('create')">＋ New Voucher</button>
+      <button class="nav-btn" onclick="showTab('list')">📋 All Vouchers</button>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+
+    <!-- ═══ CREATE VOUCHER ═══ -->
+    <section id="tab-create" class="tab active">
+      <h2>New Voucher</h2>
+      <p class="hint">Fill in the details below. A serial number is auto-assigned on save.</p>
+
+      <form id="voucherForm">
+
+        <fieldset>
+          <legend>Header</legend>
+          <div class="grid2">
+            <label>Date<input type="date" name="date" required /></label>
+            <label>Payee Name<input type="text" name="payeeName" required placeholder="Full name" /></label>
+            <label>Payee Address<input type="text" name="payeeAddress" placeholder="P.O. Box / Street" /></label>
+            <label>Account Name<input type="text" name="accountName" /></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Particulars</legend>
+          <table class="line-table" id="itemsTable">
+            <thead>
+              <tr><th>Date</th><th>Particulars</th><th>Kshs</th><th>Cts</th><th></th></tr>
+            </thead>
+            <tbody id="itemsBody">
+              <tr>
+                <td><input type="date" name="item_date" /></td>
+                <td><input type="text" name="item_particulars" placeholder="Description" /></td>
+                <td><input type="number" name="item_kshs" min="0" placeholder="0" /></td>
+                <td><input type="number" name="item_cts" min="0" max="99" placeholder="00" /></td>
+                <td><button type="button" class="btn-del" onclick="removeRow(this)">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <button type="button" class="btn-add" onclick="addItemRow()">＋ Add Row</button>
+        </fieldset>
+
+        <fieldset>
+          <legend>Payment</legend>
+          <div class="grid2">
+            <label style="grid-column:1/-1">Amount in Words
+              <input type="text" name="amountInWords" placeholder="e.g. Kenya Shillings Fifty Thousand Only" />
+            </label>
+
+            <!-- PAYMENT METHOD SELECTION -->
+            <label style="grid-column:1/-1">
+              Payment Method
+              <select name="paymentMethod" id="paymentMethod" onchange="handlePaymentMethodChange()">
+                <option value="">Select Payment Method...</option>
+                <option value="CASH">Cash</option>
+                <option value="ONLINE">Online</option>
+                <option value="KCB_OPERATIONS">KCB Operations</option>
+                <option value="KCB_DEVELOPMENT">KCB Development</option>
+                <option value="EQUITY_BANK">Equity Bank</option>
+              </select>
+            </label>
+
+            <!-- Dynamic Payment Details Field -->
+            <div id="paymentDetailsContainer" style="grid-column:1/-1; display:none;">
+              <label>
+                <span id="paymentDetailsLabel">Payment Reference</span>
+                <input type="text" name="paymentDetails" id="paymentDetails" placeholder="Enter payment reference" />
+                <small id="paymentDetailsHint" style="display:block;color:#6b7280;font-size:0.75rem;margin-top:4px;"></small>
+              </label>
+            </div>
+
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Expenditure Voteheads</legend>
+          <table class="line-table">
+            <thead>
+              <tr><th>Date</th><th>Expenditure Votehead</th><th>Kshs</th><th>Cts</th><th></th></tr>
+            </thead>
+            <tbody id="vhBody">
+              <tr>
+                <td><input type="date" name="vh_date" /></td>
+                <td><input type="text" name="vh_votehead" placeholder="Votehead description" /></td>
+                <td><input type="number" name="vh_kshs" min="0" placeholder="0" /></td>
+                <td><input type="number" name="vh_cts" min="0" max="99" placeholder="00" /></td>
+                <td><button type="button" class="btn-del" onclick="removeRow(this)">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <button type="button" class="btn-add" onclick="addVhRow()">＋ Add Row</button>
+        </fieldset>
+
+        <fieldset>
+          <legend>Authorisation</legend>
+          <div class="grid2">
+            <label>Prepared By<input type="text" name="preparedBy" /></label>
+            <label>Prepared Date<input type="date" name="preparedDate" /></label>
+            <label>Finance Officer (Approved By)<input type="text" name="approvedBy" /></label>
+            <label>Approved Date<input type="date" name="approvedDate" /></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Receipt Acknowledgement</legend>
+          <div class="grid2">
+            <label style="grid-column:1/-1">Received A Sum of Kshs
+              <input type="text" name="receivedSum" placeholder="Will be auto-generated" readonly style="background:#f1f5f9;" />
+            </label>
+            <label>Cash / Cheque
+              <select name="receivedCashOrCheque">
+                <option value="">Select...</option>
+                <option value="CASH">Cash</option>
+                <option value="CHEQUE">Cheque</option>
+                <option value="EFT">Electronic Funds Transfer</option>
+              </select>
+            </label>
+            <label>Receiver ID No <span style="color:#9ca3af;font-weight:normal;">(Optional)</span>
+              <input type="text" name="receiverIdNo" placeholder="National ID" />
+            </label>
+            <label>Received Date
+              <input type="date" name="receivedDate" />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Principal Authorisation</legend>
+          <div class="grid2">
+            <label style="grid-column:1/-1">
+              <em style="font-weight:normal;color:#6b7280;">Principal will sign physically on the printed document — signature is not captured here.</em>
+            </label>
+            <label>Principal Authorisation Date <span style="color:#9ca3af;font-weight:normal;">(Optional)</span>
+              <input type="date" name="authorizedDate" />
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">💾 Save &amp; Get PDF</button>
+          <button type="reset" class="btn-sec">✕ Clear</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ═══ VOUCHER LIST ═══ -->
+    <section id="tab-list" class="tab">
+      <div class="list-header">
+        <h2>All Vouchers</h2>
+        <div>
+          <button class="btn-sec" onclick="loadVouchers()">⟳ Refresh</button>
+        </div>
+      </div>
+
+      <table class="data-table" id="voucherTable">
+        <thead>
+          <tr>
+            <th>Voucher No</th>
+            <th>Date</th>
+            <th>Payee</th>
+            <th>Amount</th>
+            <th>Payment Method</th>
+            <th>Reference</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="voucherBody">
+          <tr><td colspan="7" class="loading">Loading…</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

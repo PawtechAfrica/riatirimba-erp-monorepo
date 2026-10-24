@@ -1,0 +1,15 @@
+meta {
+  name: get-location
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{address}}/shared/locations
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

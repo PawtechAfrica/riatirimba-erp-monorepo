@@ -1,0 +1,47 @@
+meta {
+  name: migrate-excel
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{address}}/students/migrate-excel
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "period": "jan",
+    "year": 2021,
+    "final": [
+      {
+        "Reg No": "HDB003/2021",
+        "NEMIS Code": "N/A",
+        "ID No": "37008938",
+        "PIN No": "N/A",
+        "Name": "Mwenje Frenje",
+        "Gender": "Male",
+        "DOB(dd/MM/yyyy)": "N/A",
+        "KNEC Index No": "40732216016/2016",
+        "P.0.BOX": 25,
+        "Zip Code": 40201,
+        "Town": "GESUSU",
+        "Email": "N/A",
+        "Mobile": "N/A",
+        "County": "KISII",
+        "Location": "N/A",
+        "Sub-Location": "N/A",
+        "Village": "N/A",
+        "Date Of Admission (dd/MM/yyyy)": 44378,
+        "Course": "ARTISAN GRADE III IN HAIRDRESSING (NITA)",
+        "status": "Ongoing",
+        "YearOfStudy": 3
+      }
+    ]
+  }
+}
+
+settings {
+  encodeUrl: true
+}

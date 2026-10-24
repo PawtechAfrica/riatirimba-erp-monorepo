@@ -1,0 +1,60 @@
+import { ApplicantsRecordKeys } from '../@types';
+
+export const APPLICANT_RECORD_KEYS: ApplicantsRecordKeys[] = [
+    'id',
+    // Base Info
+    'firstName',
+    'middleName',
+    'lastName',
+    'email',
+    'phone',
+    'birthCertNumber',
+    'idNumber',
+    'gender',
+    // 'birthDay',
+    'pinNumber',
+    // Address
+    'zipCode',
+    'poBox',
+    'county',
+    'location',
+    'subLocation',
+    'village',
+    // Academic
+    'highestEducationLevel',
+    'kcseIndexNumber',
+    'kcpeIndexNumber',
+    'primarySchool',
+    'highSchool',
+    'tertiaryLevel',
+    'tertiarySchool',
+    'kcseGrade',
+    // Enrollment
+    'course',
+    'newApplicant',
+    'intake',
+    'dateOfBirth',
+    'admissionNumber',
+    'yearOfStudy',
+    'examiningBody',
+    'studentType',
+    // NOK 1
+    'nok1FirstName',
+    'nok1LastName',
+    'nok1Phone',
+    'nok1Email',
+    'nok1Relationship',
+    // NOK 2
+    'nok2FirstName',
+    'nok2LastName',
+    'nok2Phone',
+    'nok2Email',
+    'nok2Relationship',
+    // Status
+    'submitted',
+    'completionStatus',
+    'migrated',
+    'pending',
+    'createdAt',
+    'updatedAt',
+];

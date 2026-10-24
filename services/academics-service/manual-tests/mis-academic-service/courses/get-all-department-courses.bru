@@ -1,0 +1,11 @@
+meta {
+  name: get-all-department-courses
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://{{localhost}}:5001/api/courses
+  body: none
+  auth: inherit
+}

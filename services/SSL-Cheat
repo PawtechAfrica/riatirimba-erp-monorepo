@@ -1,0 +1,97 @@
+# Save as cheat sheet
+echo "# SSL SETUP CHEAT SHEET
+# Let's Encrypt + Nginx + Docker + UFW
+# For: api.riatirimbatvc.ac.ke
+
+## 📋 PREREQUISITES
+- Domain pointing to VPS IP
+- Docker & docker-compose installed
+- Nginx container running
+- Ports 80/443 open
+
+## 🚀 QUICK START COMMANDS
+
+### 1. STOP NGINX
+cd /srv/RIATIRIMBA-ERP
+docker-compose stop nginx
+
+### 2. INSTALL CERTBOT
+sudo apt update
+sudo apt install certbot -y
+
+### 3. GET CERTIFICATE (DNS CHALLENGE)
+sudo certbot certonly --manual --preferred-challenges dns -d api.riatirimbatvc.ac.ke
+
+### 4. DNS SETUP WHEN PROMPTED:
+- Name: _acme-challenge.api
+- Type: TXT
+- Value: [from certbot]
+- TTL: 300
+
+### 5. VERIFY DNS BEFORE CONTINUING:
+# From another terminal
+nslookup -type=TXT _acme-challenge.api.riatirimbatvc.ac.ke
+
+### 6. PRESS ENTER in Certbot after DNS verification
+
+## 🐳 DOCKER COMPOSE UPDATE
+# Update volumes in docker-compose.yml:
+volumes:
+  - ./Nginx/nginx-ssl.conf:/etc/nginx/nginx.conf:ro
+  - /etc/letsencrypt/live/api.riatirimbatvc.ac.ke/fullchain.pem:/etc/nginx/certs/fullchain.pem:ro
+  - /etc/letsencrypt/live/api.riatirimbatvc.ac.ke/privkey.pem:/etc/nginx/certs/privkey.pem:ro
+  - ./Nginx/html:/usr/share/nginx/html
+
+## 🛡️ FIREWALL SETUP
+sudo apt install ufw -y
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow ssh
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable
+
+## 🚀 START NGINX WITH SSL
+docker-compose up -d nginx
+docker exec nginx_proxy nginx -t
+
+## ✅ VERIFICATION COMMANDS
+# 1. Check certificates
+sudo ls -la /etc/letsencrypt/live/api.riatirimbatvc.ac.ke/
+
+# 2. Test SSL
+curl -I https://api.riatirimbatvc.ac.ke
+openssl s_client -connect api.riatirimbatvc.ac.ke:443 -servername api.riatirimbatvc.ac.ke
+
+# 3. Check firewall
+sudo ufw status
+
+# 4. Check Docker
+docker ps
+
+# 5. Check certificate expiry
+sudo certbot certificates
+
+## 🔄 AUTO-RENEWAL SETUP
+# 1. Create renewal hook
+sudo nano /etc/letsencrypt/renewal-hooks/post/restart-nginx.sh
+# Add: #!/bin/bash
+# docker-compose -f /srv/RIATIRIMBA-ERP/docker-compose.yml restart nginx
+sudo chmod +x /etc/letsencrypt/renewal-hooks/post/restart-nginx.sh
+
+# 2. Add cron job
+sudo crontab -e
+# Add: 0 3 * * * /usr/bin/certbot renew --quiet --post-hook \"docker-compose -f /srv/RIATIRIMBA-ERP/docker-compose.yml restart nginx\"
+
+# 3. Test renewal
+sudo certbot renew --dry-run" > ~/ssl-setup-cheatsheet.txt
+
+# Make it executable (optional)
+chmod +x ~/ssl-setup-cheatsheet.txt
+
+
+
+
+RENEWAL
+
+sudo certbot certonly --manual --preferred-challenges dns -d api.riatirimbatvc.ac.ke

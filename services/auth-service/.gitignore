@@ -1,0 +1,7 @@
+# prevent key leakage
+keys/private_*.pem
+
+node_modules
+# .env*
+.idea
+.zed

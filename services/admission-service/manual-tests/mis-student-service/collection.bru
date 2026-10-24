@@ -1,0 +1,8 @@
+script:pre-request {
+  // auto load access_token
+  const token = bru.getGlobalEnvVar('access_token');
+  
+  if(token){
+    req.setHeader('Authorization', `Bearer ${token}`)
+  }
+}

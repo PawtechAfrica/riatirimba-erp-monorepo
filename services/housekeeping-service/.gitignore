@@ -1,0 +1,18 @@
+# Environment variables — contains real passwords and tokens
+.env
+
+# Rclone config — contains Backblaze B2 account ID and secret key
+rclone.conf
+
+# Database credentials — contains plaintext passwords
+dbs.json
+
+# Local backup dump files — generated at runtime
+local-backups/
+
+# Node modules
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db!.env.example

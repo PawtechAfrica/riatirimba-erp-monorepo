@@ -1,0 +1,8 @@
+ignoredBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - esbuild
+packages:
+  - 'apps/*'
+  - 'packages/*'
+  - 'clients/*'
+

@@ -1,0 +1,39 @@
+meta {
+  name: give-authority
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{address}}/users/2
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "username": "Mr. Joseph Kawala",
+    "email": "principal@riatirimbatvc.ac.ke",
+    "role": "principal",
+    "id": 2,
+    "permissionIds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

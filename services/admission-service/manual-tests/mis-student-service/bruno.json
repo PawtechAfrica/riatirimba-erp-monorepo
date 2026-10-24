@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "mis-admission-service",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

@@ -1,0 +1,26 @@
+# Node dependencies
+node_modules
+npm-debug.log
+
+# Local env files
+.env
+
+# OS/IDE/editor files
+.DS_Store
+*.swp
+.vscode
+
+# Sequelize logs or DBs
+*.sqlite
+*.log
+
+# Test/coverage output
+coverage
+__tests__/
+
+# Docker config files (optional)
+.dockerignore
+docker-compose.yml
+
+# Ignore documentation
+README.md

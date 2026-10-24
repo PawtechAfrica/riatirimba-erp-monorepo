@@ -1,0 +1,42 @@
+[
+    {
+        "type": "postgres",
+        "name": "academics_db",
+        "host": "academics-database",
+        "user": "postgres",
+        "password": "Afnog@#1",
+        "database": "academics_db"
+    },
+    {
+        "type": "postgres",
+        "name": "admission_db",
+        "host": "admission-database",
+        "user": "postgres",
+        "password": "Afnog@#1",
+        "database": "admission_db"
+    },
+    {
+        "type": "postgres",
+        "name": "students_db",
+        "host": "students-database",
+        "user": "postgres",
+        "password": "Afnog@#1",
+        "database": "students_db"
+    },
+    {
+        "type": "postgres",
+        "name": "reporting_db",
+        "host": "reporting-database",
+        "user": "postgres",
+        "password": "Afnog@#1",
+        "database": "students_db"
+    },
+    {
+        "type": "mysql",
+        "name": "auth_db",
+        "host": "auth-database",
+        "user": "lawrence",
+        "password": "Afnog@#1",
+        "database": "auth_db"
+    }
+]

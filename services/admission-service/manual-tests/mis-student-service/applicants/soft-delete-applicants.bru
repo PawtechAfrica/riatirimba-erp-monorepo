@@ -1,0 +1,21 @@
+meta {
+  name: soft-delete-applicants
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{address}}/applicants/delete
+  body: json
+  auth: inherit
+}
+
+body:json {
+  [
+    "1506f796-7f0d-4369-9262-f5c1c4534fe0"
+  ]
+}
+
+settings {
+  encodeUrl: true
+}

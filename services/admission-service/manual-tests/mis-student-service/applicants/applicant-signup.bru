@@ -1,0 +1,34 @@
+meta {
+  name: applicant-signup
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{address}}/applicants/signup
+  body: json
+  auth: inherit
+}
+
+body:json {
+  // {
+  //   "firstName": "Joyner",
+  //   "lastName": "Lucas",
+  //   "email": "lucas@gmail.com",
+  //   "phone": "+254784567888", 
+  //   "kcpeIndexNumber": "11111111111/2024"
+  // }
+  {
+      "firstName": "Jumas",
+    "lastName": "Siana",
+    "email": "jumasia@gmail.com",
+    "phone": "+254784567889",
+    "kcpeIndexNumber": "11111111112/2024"
+  }
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

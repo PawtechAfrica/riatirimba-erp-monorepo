@@ -1,0 +1,61 @@
+1. Get All Courses Categorized by Department
+Endpoint: GET /api/courses
+Response Format:
+
+{
+  "AllDepartmentCourses": [
+    {
+      "id": 1,
+      "name": "Mechanical and Automotive Engineering Department",
+      "courses": [
+        {
+          "id": 1,
+          "name": "Mechanical Production Technology",
+          "code": "L6MEP",
+          "duration": 6
+        }
+      ]
+    }
+  ]
+}
+
+
+
+2. Get All Departments
+Endpoint: GET /api/departments
+Response Format:
+
+{
+  "departments": [
+    {
+      "id": 1,
+      "name": "Mechanical and Automotive Engineering Department",
+      "createdAt": "ISO-8601 Timestamp",
+      "updatedAt": "ISO-8601 Timestamp"
+    }
+  ]
+}
+
+
+
+
+3. Get Courses by Department
+Endpoint: GET /api/departments/:id/courses
+URL Parameter: id (Department ID)
+
+Response Format:
+
+[
+  {
+    "id": 1,
+    "code": "L6MEP",
+    "name": "Mechanical Production Technology",
+    "level": 6,
+    "entryRequirements": "C- , Pass in Level 5",
+    "duration": 6,
+    "examBody": "TVET CDACC",
+    "departmentId": 1,
+    "createdAt": "ISO-8601 Timestamp",
+    "updatedAt": "ISO-8601 Timestamp"
+  }
+]

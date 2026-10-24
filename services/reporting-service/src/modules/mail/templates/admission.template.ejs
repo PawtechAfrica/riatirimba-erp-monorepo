@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admission Letter - <%= firstName %> <%= lastName %></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            margin-bottom: 20px;
+        }
+
+        h1, h2, h3 {
+            margin: 5px 0;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            width: 20%;
+        }
+
+        .underline-cell {
+            border-bottom: 1px solid black;
+            width: 80%;
+        }
+
+        .page-break {
+            border-top: 3px double #000;
+            margin: 40px 0;
+            padding-top: 10px;
+            text-align: center;
+            font-size: 0.8em;
+            page-break-after: always;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h3>MINISTRY OF EDUCATION</h3>
+    <h1>RIATIRIMBA TECHNICAL AND VOCATIONAL COLLEGE</h1>
+    <p>P.O. BOX 25-40201 GESUSU | Mobile: 0757331085<br>
+        Email: info@riatirimbatvc.ac.ke | Website: www.riatirimbatvc.ac.ke</p>
+</header>
+
+<div class="section">
+    <table>
+        <tr>
+            <th>FULL NAME</th>
+            <td class="underline-cell"><%= name %></td>
+        </tr>
+        <tr>
+            <th>ADM.NO</th>
+            <td class="underline-cell"><%= admissionNumber %></td>
+        </tr>
+    </table>
+
+    <h2>RE: OFFER OF ADMISSION AND JOINING INSTRUCTIONS</h2>
+    <p>Following your application for admission to Riatirimba Technical and Vocational College (RTVC), we are pleased to
+        inform you that your application was successful. You have been offered a chance to pursue studies in <strong><%= course %></strong> under the
+        <strong><%= department %></strong></p>
+
+    <p>
+        <strong>Registration:</strong> From 01/09/2025 (9:00am - 5:00pm).<br>
+        <strong>Lectures:</strong> Begin 02/09/2025.<br>
+        <strong>Deadline:</strong> Those not reporting by 05/09/2025 will be assumed to have no further interest and
+        forfeit the chance.
+    </p>
+
+    <h3>Payment of Fees</h3>
+    <p>All fees for the academic year must be deposited to the college account. No cash is accepted in the college.</p>
+    <ul>
+        <li><strong>Bank Name:</strong> KENYA COMMERCIAL BANK (KCB)</li>
+        <li><strong>Branch:</strong> KEROKA</li>
+        <li><strong>Account Name:</strong> RIATIRIMBA TECHNICAL AND VOCATIONAL COLLEGE</li>
+        <li><strong>Account No:</strong> 1283392763</li>
+    </ul>
+
+    <p><em>Yours sincerely,</em><br>
+        <strong>KAWALA J.O</strong><br>
+        PRINCIPAL/BOG SECRETARY
+    </p>
+</div>
+
+<div class="page-break"></div>
+
+<div class="section">
+    <h2>JOINING INSTRUCTIONS & MEDICAL FORM</h2>
+    <p><strong>Stationery:</strong> Students must bring ruled papers, A4 exercise books, files, pens, and a scientific
+        calculator.</p>
+    <p><strong>Health:</strong> A medical examination must be completed by a certified healthcare professional
+        (Government Doctor or Registered Practitioner). The college provides only basic first aid; trainees are
+        responsible for external medical expenses and are encouraged to utilize SHIF coverage.</p>
+</div>
+
+<div class="section">
+    <h2>REQUIREMENTS FOR ADMISSION</h2>
+    <ul>
+        <li>Copies & Originals of:
+            <ol>
+                <li>Birth Certificate</li>
+                <li>National ID</li>
+                <li>Leaving Certificates (Primary & Secondary)</li>
+                <li>KCPE Result Slip</li>
+                <li>KCSE Certificate/Result Slip</li>
+            </ol>
+        </li>
+        <li>Two (2) Colored Passport Size Photos</li>
+        <li>One (1) Ream of printing papers and 4 Spring Files</li>
+
+        <% if (isEngineering) { %>
+            <li><strong>Engineering Specific Requirements:</strong>
+                <ol>
+                    <li>Navy-blue dust coat or overall</li>
+                    <li>Safety boots</li>
+                    <li>Technical drawing set & T-square</li>
+                    <li>Scientific calculator (e.g., fx82ms, fx570ES PLUS)</li>
+                </ol>
+            </li>
+        <% } %>
+    </ul>
+</div>
+
+</body>
+</html>

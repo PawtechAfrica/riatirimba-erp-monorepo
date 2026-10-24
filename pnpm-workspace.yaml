@@ -1,0 +1,12 @@
+packages:
+  - "frontends/*"
+  - "services/*"
+  - "erp-sdk"
+allowBuilds:
+  bcrypt: true
+  esbuild: true
+  msgpackr-extract: true
+  protobufjs: true
+  puppeteer: true
+  sharp: true
+  unrs-resolver: true

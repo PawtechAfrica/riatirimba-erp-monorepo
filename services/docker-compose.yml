@@ -1,0 +1,473 @@
+services:
+
+    # VALKEY - REDIS FORK
+    valkey:
+        image: valkey/valkey:8-alpine
+        container_name: valkey
+        restart: unless-stopped
+        ports:
+            - "6379:6379"
+        volumes:
+            - valkey_data:/data
+        command: valkey-server --requirepass TheRiseOfValkey
+        networks:
+            - college-mis-network
+
+    # REVERSE PROXY - NGINX
+    nginx:
+        image: nginx:stable-alpine
+        container_name: nginx_proxy
+        # profiles: ["production"]
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./Nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+            - /etc/letsencrypt/live/api.riatirimbatvc.ac.ke/fullchain.pem:/etc/nginx/certs/fullchain.pem:ro
+            - /etc/letsencrypt/live/api.riatirimbatvc.ac.ke/privkey.pem:/etc/nginx/certs/privkey.pem:ro
+            # - ./certs:/etc/letsencrypt
+            - ./Nginx/html:/etc/nginx/html
+        depends_on:
+            - admission-service
+            - academics-service
+            - filegate-service
+            - auth-service
+            - students-service
+        networks:
+            - college-mis-network
+
+    backup-service:
+        build: ./backup-service
+        container_name: backup-service
+        env_file: ./backup-service/.env.backup
+        volumes:
+            - ./backup-service/backups:/app/backups
+            - ./backup-service/dbs.json:/app/dbs.json
+            - ./backup-service/rclone.conf:/root/.config/rclone/rclone.conf
+        networks:
+            - college-mis-network
+        restart: always
+
+    # academics
+    academics-database:
+        image: postgres:16
+        container_name: academics-database
+        restart: unless-stopped
+        # env_file:
+        #   - ./academics_service/.env
+        environment:
+            POSTGRES_USER: ${ACADEMICS_DB_USERNAME}
+            POSTGRES_PASSWORD: ${ACADEMICS_DB_PASSWORD}
+            POSTGRES_DB: ${ACADEMICS_DB_NAME}
+            PGDATA: /var/lib/postgresql/data/
+            POSTGRES_INITDB_ARGS: --encoding=UTF-8
+            POSTGRES_HOST_AUTH_METHOD: md5
+
+        ports:
+            - "5433:5432"
+
+        volumes:
+            - academics_pgdata:/var/lib/postgresql/data
+            #  - ./academics_service/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+        healthcheck:
+            test: [ "CMD", "pg_isready", "-U", "postgres" ]
+            interval: 1m30s
+            timeout: 30s
+            retries: 5
+            start_period: 30s
+        networks:
+            - college-mis-network
+
+    academics-service:
+        build: ./academics-service
+        env_file:
+            - ./academics-service/.env.academics
+        container_name: academics_api
+        restart: on-failure
+        ports:
+            - "3000:3000"
+        depends_on:
+            - academics-database
+        networks:
+            - college-mis-network
+        # environment:
+        #   - NODE_ENV=${NODE_ENV}
+        # volumes:
+        #   - ./academics_service:/app
+        #   - /app/nodemodules
+
+        # admission
+    admission-database:
+        image: postgres:16
+        container_name: admission-database
+        # env_file:
+        #   - ./admission/.env
+        environment:
+            POSTGRES_USER: ${ADMISSION_DB_USERNAME}
+            POSTGRES_PASSWORD: ${ADMISSION_DB_PASSWORD}
+            POSTGRES_DB: ${ADMISSION_DB_NAME}
+            PGDATA: /var/lib/postgresql/data
+            POSTGRES_INITDB_ARGS: --encoding=UTF-8
+            POSTGRES_HOST_AUTH_METHOD: md5
+
+        volumes:
+            - admission_pgdata:/var/lib/postgresql/data
+        healthcheck:
+            test: [ "CMD", "pg_isready", "-U", "postgres" ]
+            interval: 1m30s
+            timeout: 30s
+            retries: 5
+            start_period: 30s
+
+        ports:
+            - "5444:5432"
+        networks:
+            - college-mis-network
+
+    admission-service:
+        build:
+            context: ./admission-service
+            dockerfile: ./Dockerfile
+        env_file:
+            - ./admission-service/.env.admission
+        container_name: admission_api
+        ports:
+            - "5000:5000"
+        restart: on-failure
+        depends_on:
+            - admission-database
+
+        networks:
+            - college-mis-network
+
+    # students
+    students-database:
+        image: postgres:16
+        container_name: students-database
+        # env_file:
+        #   - ./admission/.env
+        environment:
+            POSTGRES_USER: ${STUDENTS_DB_USERNAME}
+            POSTGRES_PASSWORD: ${STUDENTS_DB_PASSWORD}
+            POSTGRES_DB: ${STUDENTS_DB_NAME}
+            PGDATA: /var/lib/postgresql/data
+            POSTGRES_INITDB_ARGS: --encoding=UTF-8
+            POSTGRES_HOST_AUTH_METHOD: md5
+
+        volumes:
+            - students_pgdata:/var/lib/postgresql/data
+        healthcheck:
+            test: [ "CMD", "pg_isready", "-U", "postgres" ]
+            interval: 1m30s
+            timeout: 30s
+            retries: 5
+            start_period: 30s
+
+        ports:
+            - "5455:5432"
+        networks:
+            - college-mis-network
+
+    students-service:
+        build:
+            context: ./students-service
+            dockerfile: ./Dockerfile
+        env_file:
+            - ./students-service/.env.students
+        container_name: students_api
+        ports:
+            - "5002:5002"
+        restart: on-failure
+        depends_on:
+            - students-database
+
+        networks:
+            - college-mis-network
+
+    # auth
+    auth-database:
+        image: postgres:16
+        container_name: auth-database
+        restart: always
+        environment:
+            POSTGRES_USER: ${AUTH_DB_USERNAME}
+            POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+            POSTGRES_DB: ${AUTH_DB_NAME}
+            PGDATA: /var/lib/postgresql/data
+            POSTGRES_INITDB_ARGS: --encoding=UTF-8
+            POSTGRES_HOST_AUTH_METHOD: md5
+        ports:
+            - "5456:5432"
+        volumes:
+            - auth_pgdata:/var/lib/postgresql/data
+        healthcheck:
+            test: [ "CMD", "pg_isready", "-U", "postgres" ]
+            interval: 1m30s
+            timeout: 30s
+            retries: 5
+            start_period: 10s
+
+        networks:
+            - college-mis-network
+
+    auth-service:
+        build:
+            context: ./auth-service
+            dockerfile: ./Dockerfile
+        container_name: auth_api
+        restart: always
+        env_file:
+            - ./auth-service/.env.auth
+        environment:
+            AUTH_DB_HOST: auth-database
+            AUTH_DB_USERNAME: ${AUTH_DB_USERNAME}
+            AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD}
+            AUTH_DB_NAME: ${AUTH_DB_NAME}
+            AUTH_DB_DIALECT: mysql
+        ports:
+            - "4000:4000"
+        depends_on:
+            - auth-database
+        networks:
+            - college-mis-network
+
+    # Reporting service
+    # reporting-database:
+    #     image: postgres:16
+    #     container_name: reporting-database
+    #     # env_file:
+    #     #   - ./admission/.env
+    #     environment:
+    #         POSTGRES_USER: ${REPORTING_DB_USERNAME}
+    #         POSTGRES_PASSWORD: ${REPORTING_DB_PASSWORD}
+    #         POSTGRES_DB: ${REPORTING_DB_NAME}
+    #         PGDATA: /var/lib/postgresql/data
+    #         POSTGRES_INITDB_ARGS: --encoding=UTF-8
+    #         POSTGRES_HOST_AUTH_METHOD: md5
+
+    #     volumes:
+    #         - reporting_pgdata:/var/lib/postgresql/data
+    #     healthcheck:
+    #         test: [ "CMD", "pg_isready", "-U", "postgres" ]
+    #         interval: 1m30s
+    #         timeout: 30s
+    #         retries: 5
+    #         start_period: 30s
+
+    #     ports:
+    #         - "5457:5432"
+    #     networks:
+    #         - college-mis-network
+    # reporting-service:
+    #     build:
+    #         context: ./reporting-service
+    #         dockerfile: ./Dockerfile
+    #     container_name: reporting_api
+    #     restart: always
+    #     env_file:
+    #         - ./reporting-service/.env.reporting
+    #     environment:
+    #         REPORTING_DB_HOST: reporting-database
+    #         REPORTING_DB_USERNAME: ${REPORTING_DB_USERNAME}
+    #         REPORTING_DB_PASSWORD: ${REPORTING_DB_PASSWORD}
+    #         REPORTING_DB_NAME: ${REPORTING_DB_NAME}
+    #         REPORTING_DB_DIALECT: postgres
+    #     ports:
+    #         - "5004:5004"
+    #     depends_on:
+    #         - reporting-database
+    #     networks:
+    #         - college-mis-network
+
+    # file_gate and b2 configuration
+    filegate-database:
+        image: mysql:8.0
+        container_name: filegate-database
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_NAME}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            # POSTGRES_USER: ${DB_USERNAME}
+            # POSTGRES_PASSWORD: ${DB_PASSWORD}
+            # POSTGRES_DB: ${DB_NAME}
+            # PGDATA: /var/lib/postgresql/data
+            # POSTGRES_INITDB_ARGS: --encoding=UTF-8
+            # POSTGRES_HOST_AUTH_METHOD: md5
+        ports:
+            - "3308:3306"
+        volumes:
+            - filegate_mysqldata:/var/lib/mysql
+            # - filegate_pgdata:/var/lib/postgresql/data
+        healthcheck:
+            test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prootpass" ]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 20s
+
+        networks:
+            - college-mis-network
+
+    filegate-service:
+        build:
+            context: ./filegate-service
+            dockerfile: ./Dockerfile
+        container_name: filegate_api
+        restart: always
+        env_file:
+            - ./filegate-service/.env.filegate
+        environment:
+            DB_HOST: filegate-database
+            DB_USERNAME: ${DB_USERNAME}
+            DB_PASSWORD: ${DB_PASSWORD}
+            DB_NAME: ${DB_NAME}
+            DB_DIALECT: mysql
+        ports:
+            - "4001:4000"
+        depends_on:
+            - filegate-database
+        networks:
+            - college-mis-network
+
+    excelerate-service:
+        build:
+            context: ./excelerate-service
+            dockerfile: ./Dockerfile
+        container_name: excelerate_api
+        restart: always
+        env_file:
+            - ./excelerate-service/.env.excelerate
+        # environment:
+        #   DB_HOST: filegate-database
+        #   DB_USERNAME: ${DB_USERNAME}
+        #   DB_PASSWORD: ${DB_PASSWORD}
+        #   DB_NAME: ${DB_NAME}
+        #   DB_DIALECT: mysql
+        ports:
+            - "6000:6000"
+        # depends_on:
+        #   # - filegate-database
+        networks:
+            - college-mis-network
+
+    # ─── VOUCHER SERVICE ─────────────────────────────────────────────────────
+    voucher-database:
+        image: postgres:16
+        container_name: voucher-database
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: ${VOUCHER_DB_USERNAME}
+            POSTGRES_PASSWORD: ${VOUCHER_DB_PASSWORD}
+            POSTGRES_DB: ${VOUCHER_DB_NAME}
+            PGDATA: /var/lib/postgresql/data/
+            POSTGRES_INITDB_ARGS: --encoding=UTF-8
+            POSTGRES_HOST_AUTH_METHOD: md5
+        ports:
+            - "5458:5432" # Use a unique port
+        volumes:
+            - voucher_pgdata:/var/lib/postgresql/data
+        healthcheck:
+            test: [ "CMD", "pg_isready", "-U", "postgres" ]
+            interval: 1m30s
+            timeout: 30s
+            retries: 5
+            start_period: 30s
+        networks:
+            - college-mis-network
+
+    voucher-service:
+        build:
+            context: ./finance-service/voucher
+            dockerfile: ./Dockerfile
+        container_name: voucher_api
+        restart: on-failure
+        env_file:
+            - ./finance-service/voucher/.env
+        environment:
+            VOUCHER_DB_HOST: voucher-database
+            VOUCHER_DB_USERNAME: ${VOUCHER_DB_USERNAME}
+            VOUCHER_DB_PASSWORD: ${VOUCHER_DB_PASSWORD}
+            VOUCHER_DB_NAME: ${VOUCHER_DB_NAME}
+            VOUCHER_DB_DIALECT: postgres
+            PORT: 7000
+        ports:
+            - "7000:7000"
+        depends_on:
+            - voucher-database
+        volumes:
+            - ./finance-service/voucher/assets:/app/assets # For logo images
+        networks:
+            - college-mis-network
+
+
+
+    # ─── FEES SERVICE ─────────────────────────────────────────────────────
+    fees-database:
+        image: postgres:16
+        container_name: fees-database
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: ${FEES_DB_USERNAME}
+            POSTGRES_PASSWORD: ${FEES_DB_PASSWORD}
+            POSTGRES_DB: ${FEES_DB_NAME}
+            PGDATA: /var/lib/postgresql/data/
+            POSTGRES_INITDB_ARGS: --encoding=UTF-8
+            POSTGRES_HOST_AUTH_METHOD: md5
+        ports:
+            - "5460:5432" # Use a unique port
+        volumes:
+            - voucher_pgdata:/var/lib/postgresql/data
+        healthcheck:
+            test: [ "CMD", "pg_isready", "-U", "postgres" ]
+            interval: 1m30s
+            timeout: 30s
+            retries: 5
+            start_period: 30s
+        networks:
+            - college-mis-network
+
+    fees-service:
+        build:
+            context: ./finance-service/fees
+            dockerfile: ./Dockerfile
+        container_name: fees_api
+        restart: on-failure
+        env_file:
+            - ./finance-service/fees/.env
+        environment:
+            VOUCHER_DB_HOST: fees-database
+            VOUCHER_DB_USERNAME: ${FEES_DB_USERNAME}
+            VOUCHER_DB_PASSWORD: ${FEES_DB_PASSWORD}
+            VOUCHER_DB_NAME: ${FEES_DB_NAME}
+            VOUCHER_DB_DIALECT: postgres
+            PORT: 8000
+        ports:
+            - "8000:8000"
+        depends_on:
+            - fees-database
+        volumes:
+            - ./finance-service/fees/assets:/app/assets # For logo images
+        networks:
+            - college-mis-network
+
+
+volumes:
+    academics_pgdata:
+    admission_pgdata:
+    auth_pgdata:
+    filegate_mysqldata:
+    students_pgdata:
+    voucher_pgdata:
+    valkey_data:
+        # filegate_pgdata:
+        # caddy_data:
+        # caddy_config:
+
+networks:
+    college-mis-network:
+        driver: bridge
+
+# Clear Logs command 
+# sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' filegate_api)

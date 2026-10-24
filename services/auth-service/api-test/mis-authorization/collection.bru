@@ -1,0 +1,17 @@
+script:post-response {
+  const response = res.body;
+  
+  console.log("Running")
+  const token = res.body.access_token;
+  
+  if(token){
+    bru.setGlobalEnvVar('access_token', token)
+  }
+  
+  test('Response has access token', ()=>{
+    expect(res.body.access_token).to.be.a('string')
+  })
+  test('Token is saved in environment', ()=>{
+    expect(bru.getGlobalEnvVar('access_token')).to.be.a('string')
+  })
+}

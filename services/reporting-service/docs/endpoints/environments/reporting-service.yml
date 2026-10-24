@@ -1,0 +1,4 @@
+name: reporting-service
+variables:
+  - name: address
+    value: http://localhost:5004/api/v1

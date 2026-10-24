@@ -1,0 +1,28 @@
+academics_service/
+├── .dockerignore
+├── .gitignore
+├── .env
+├── Dockerfile
+├── README.md
+├── docker-compose.yml
+├── package.json
+├── scripts/
+│   └── copy-models.js
+├── Database/
+│   ├── models/
+│   │   ├── Course.js
+│   │   ├── Unit.js
+│   │   └── ...
+│   └── seeders/
+├── src/
+│   ├── app.js
+│   ├── config/
+│   │   ├── database.js
+│   │   └── ...
+│   ├── controllers/
+│   ├── utils/
+│   ├── models/
+│   │   ├── Course.js
+│   │   ├── Unit.js
+│   │   └── index.js
+│   └── routes/

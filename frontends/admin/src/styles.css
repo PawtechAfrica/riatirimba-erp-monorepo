@@ -1,0 +1,134 @@
+@import "tailwindcss/theme";
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
+
+
+@theme {
+    --color-neutral-50: oklch(0.98 0.00 286);
+    --color-neutral-100: oklch(0.95 0.01 295);
+    --color-neutral-200: oklch(0.93 0.01 292);
+    --color-neutral-300: oklch(0.87 0.02 296);
+    --color-neutral-400: oklch(0.79 0.03 298);
+    --color-neutral-500: oklch(0.70 0.05 299);
+    --color-neutral-600: oklch(0.63 0.06 302);
+    --color-neutral-700: oklch(0.57 0.06 303);
+    --color-neutral-800: oklch(0.50 0.05 302);
+    --color-neutral-900: oklch(0.44 0.04 302);
+    --color-neutral-950: oklch(0.33 0.03 301);
+
+    --color-primary-50: oklch(0.97 0.01 255);
+    --color-primary-100: oklch(0.94 0.03 256);
+    --color-primary-200: oklch(0.87 0.06 251);
+    --color-primary-300: oklch(0.78 0.12 249);
+    --color-primary-400: oklch(0.67 0.18 252);
+    --color-primary-500: oklch(0.60 0.20 256);
+    --color-primary-600: oklch(0.51 0.19 258);
+    --color-primary-700: oklch(0.44 0.16 258);
+    --color-primary-800: oklch(0.39 0.14 257);
+    --color-primary-900: oklch(0.34 0.12 258);
+    --color-primary-950: oklch(0.17 0.05 254);
+
+    --color-secondary-50: oklch(0.98 0.02 178);
+    --color-secondary-100: oklch(0.96 0.05 183);
+    --color-secondary-200: oklch(0.92 0.10 182);
+    --color-secondary-300: oklch(0.87 0.13 184);
+    --color-secondary-400: oklch(0.80 0.14 185);
+    --color-secondary-500: oklch(0.72 0.13 186);
+    --color-secondary-600: oklch(0.62 0.11 188);
+    --color-secondary-700: oklch(0.52 0.09 190);
+    --color-secondary-800: oklch(0.45 0.07 192);
+    --color-secondary-900: oklch(0.39 0.06 192);
+    --color-secondary-950: oklch(0.28 0.05 197);
+
+
+    --color-green-50: oklch(0.98 0.02 154);
+    --color-green-100: oklch(0.96 0.05 154);
+    --color-green-200: oklch(0.93 0.09 153);
+    --color-green-300: oklch(0.88 0.16 152);
+    --color-green-400: oklch(0.82 0.20 149);
+    --color-green-500: oklch(0.74 0.21 147);
+    --color-green-600: oklch(0.65 0.19 147);
+    --color-green-700: oklch(0.54 0.15 147);
+    --color-green-800: oklch(0.46 0.12 149);
+    --color-green-900: oklch(0.40 0.10 150);
+    --color-green-950: oklch(0.35 0.09 149);
+
+    --color-accent-50: oklch(0.97 0.01 25);
+    --color-accent-100: oklch(0.94 0.02 18);
+    --color-accent-200: oklch(0.90 0.04 18);
+    --color-accent-300: oklch(0.82 0.08 17);
+    --color-accent-400: oklch(0.72 0.13 18);
+    --color-accent-500: oklch(0.63 0.17 19);
+    --color-accent-600: oklch(0.56 0.18 19);
+    --color-accent-700: oklch(0.48 0.16 18);
+    --color-accent-800: oklch(0.43 0.14 15);
+    --color-accent-900: oklch(0.40 0.12 13);
+    --color-accent-950: oklch(0.26 0.08 14);
+
+    --color-orange-50: oklch(0.98 0.02 86);
+    --color-orange-100: oklch(0.94 0.04 85);
+    --color-orange-200: oklch(0.88 0.08 85);
+    --color-orange-300: oklch(0.81 0.12 80);
+    --color-orange-400: oklch(0.75 0.14 73);
+    --color-orange-500: oklch(0.66 0.14 60);
+    --color-orange-600: oklch(0.60 0.15 50);
+    --color-orange-700: oklch(0.51 0.13 42);
+    --color-orange-800: oklch(0.44 0.11 38);
+    --color-orange-900: oklch(0.39 0.10 38);
+    --color-orange-950: oklch(0.26 0.07 36);
+
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    border: transparent;
+    position: relative;
+}
+
+body {
+    @apply m-0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    @apply bg-neutral-50;
+}
+
+.card-hover {
+    @apply transition-all shadow-xl -translate-2
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.flexy > *:first-child {
+    background-color: red !important;
+    display:none;
+}
+
+.table-header {
+    @apply h-[50px] bg-gradient-to-r from-primary-700 to-secondary-800 text-white
+}
+
+.animate-top-spinner {
+    animation: top-spin 2s linear infinite;
+}
+
+@keyframes top-spin {
+    0% {
+        width: 70%;
+        background-color: oklch(0.67 0.18 252);
+    }
+    50% {
+        width: 90%;
+        background-color: red;
+    }
+    100% {
+        width: 100%;
+        background-color: oklch(0.67 0.18 252);
+    }
+}

@@ -1,0 +1,27 @@
+$ docker run --name some-postgres -e POSTGRES_PASSWORD=Afnog@#1 -d postgres
+
+
+$ docker run --name some-postgres -e POSTGRES_PASSWORD=Afnog@#1 postgres
+
+
+
+docker run --name academics-postgres \
+  -e POSTGRES_USER=lawrence \
+  -e POSTGRES_PASSWORD=Afnog@#1 \
+  -e POSTGRES_DB=academics_db \
+  -p 5433:5432 \
+  -d postgres:15-bullseye
+
+
+//non-detached mode running of postgress
+docker run --name academics-postgres \
+  -e POSTGRES_USER=lawrence \
+  -e POSTGRES_PASSWORD=Afnog@#1 \
+  -e POSTGRES_DB=academics_db \
+  -p 5433:5432 \
+  postgres:15-bullseye
+
+
+
+// resetting db when necessary
+  docker rm -f academics-db

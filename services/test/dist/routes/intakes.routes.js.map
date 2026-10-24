@@ -1,0 +1,1 @@
+{"version":3,"file":"intakes.routes.js","sourceRoot":"","sources":["../../src/routes/intakes.routes.ts"],"names":[],"mappings":";;;;;AAAA,sDAA8B;AAC9B,qEAA4C;AAE5C,MAAM,aAAa,GAAG,iBAAO,CAAC,MAAM,EAAE,CAAA;AAEtC,aAAa;KACR,IAAI,CAAC,SAAS,EAAE,iBAAO,CAAC,MAAM,CAAC;KAC/B,GAAG,CAAC,UAAU,EAAE,iBAAO,CAAC,OAAO,CAAC,CAAA;AAErC,kBAAe,aAAa,CAAA"}

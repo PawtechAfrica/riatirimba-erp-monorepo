@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Riatirimba Finance - Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- Font Awesome for real icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>Finance</h2>
+            <p>Riatirimba College</p>
+        </div>
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-page="dashboard">
+                <i class="fas fa-chart-pie icon"></i> Dashboard
+            </button>
+            <button class="nav-item" data-page="vote-heads">
+                <i class="fas fa-list icon"></i> Vote Heads
+            </button>
+            <button class="nav-item" data-page="fee-structures">
+                <i class="fas fa-building icon"></i> Fee Structures
+            </button>
+            <button class="nav-item" data-page="enrollments">
+                <i class="fas fa-user-graduate icon"></i> Enrollments
+            </button>
+            <button class="nav-item" data-page="payments">
+                <i class="fas fa-credit-card icon"></i> Payments
+            </button>
+            <button class="nav-item" data-page="students">
+                <i class="fas fa-user icon"></i> Students
+            </button>
+            <button class="nav-item" data-page="receipts">
+                <i class="fas fa-receipt icon"></i> Receipts
+            </button>
+            <button class="nav-item" data-page="reports">
+                <i class="fas fa-chart-bar icon"></i> Reports
+            </button>
+            <button class="nav-item" data-page="audit-logs">
+                <i class="fas fa-history icon"></i> Audit Logs
+            </button>
+        </nav>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+        <header class="top-header">
+            <h1 id="page-title">Dashboard</h1>
+            <div class="header-actions">
+                <span id="api-status" class="status-badge status-online">Online</span>
+                <span id="current-time"></span>
+            </div>
+        </header>
+
+        <div class="content-area" id="content-area">
+            <div id="page-content">
+                <!-- Dashboard content loaded by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Modal</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Dynamic modal content -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

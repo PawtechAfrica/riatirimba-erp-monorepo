@@ -1,0 +1,30 @@
+# ERP Service Image Tags
+
+ACADEMICS_VERSION=latest
+
+ADMISSION_VERSION=e589686
+LAST_STABLE=a17f8bc
+
+STUDENTS_VERSION=1149929
+LAST_STABLE=ff2360e
+
+AUTH_VERSION=4ccf6cd
+
+FILEGATE_VERSION=2925dee
+
+BACKUP_VERSION=9193e3c
+
+FINANCE_VERSION=081cc59
+
+REPORTING_VERSION=latest
+
+VALKEY_VERSION=8-alpine
+
+NGINX_VERSION=stable-alpine
+
+
+scp docker-compose.yml root@162.245.191.44:/srv/riatirimba-erp/
+
+scp .env.finance root@162.245.191.44:/srv/riatirimba-erp/finance-service/voucher
+
+scp -r Nginx root@162.245.191.44:/srv/riatirimba-erp/

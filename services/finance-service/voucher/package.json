@@ -1,0 +1,36 @@
+{
+  "name": "voucher",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.110.0",
+    "chokidar": "^5.0.0",
+    "cors": "^2.8.6",
+    "dayjs": "^1.11.21",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.11.0",
+    "mysql2": "^3.22.5",
+    "node-cron": "^4.5.0",
+    "number-to-words": "^1.2.4",
+    "pg": "^8.22.0",
+    "pg-hstore": "^2.3.4",
+    "puppeteer": "^25.2.1",
+    "sequelize": "^6.37.8",
+    "sequelize-cli": "^6.6.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

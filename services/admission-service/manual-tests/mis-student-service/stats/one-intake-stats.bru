@@ -1,0 +1,15 @@
+meta {
+  name: one-intake-stats
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{address}}/stats/intake-stat/s
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

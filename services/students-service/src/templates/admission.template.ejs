@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admission Letter - <%= student.firstName %> <%= student.lastName %></title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page { size: A4; margin: 0; }
+
+  html, body {
+    width: 210mm;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 9.7pt;
+    color: #1e293b;
+    background: #e2e8f0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  :root {
+    --accent:   #0a6ebd;
+    --accent-l: #dbeafe;
+    --accent-m: #93c5e8;
+    --rule:     #64748b;
+    --label:    #475569;
+    --body:     #1e293b;
+    --grey-bg:  #f1f5f9;
+    --red:      #b91c1c;
+    --red-bg:   #fde8e8;
+    --amber:    #92400e;
+    --amber-bg: #fef3d6;
+  }
+
+  .page {
+    width: 210mm;
+    height: 297mm;
+    padding: 12mm 16mm;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto 6mm;
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  .hdr {
+    display: flex; align-items: center; gap: 7mm;
+    padding-bottom: 3.5mm; border-bottom: 2.5pt solid var(--accent);
+    margin-bottom: 4mm; flex-shrink: 0;
+  }
+  .hdr-img { width: 15mm; height: 15mm; object-fit: contain; flex-shrink: 0; }
+  .hdr-center { flex: 1; text-align: center; }
+  .hdr-center .dept    { font-size: 6.8pt; color: var(--body); font-weight: 600; letter-spacing: 1.1px; text-transform: uppercase; margin-bottom: 1mm; }
+  .hdr-center .name    { font-size: 12.5pt;  font-weight: 700; color: var(--body); line-height: 1.2; }
+  .hdr-center .contact { font-size: 6.8pt; color: var(--body); margin-top: 1mm; font-weight: 600; }
+
+  /* ── TITLE BAND ── */
+  .title-band {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--accent); color: #fff;
+    border-radius: 3pt; padding: 2.8mm 5mm; margin-bottom: 4mm;
+  }
+  .title-band .doc-title,
+  .title-band .receipt-no { font-size: 9.5pt; font-weight: 700; line-height: 1; }
+
+  /* ── SALUTATION LINE ── */
+  .salutation { font-size: 10pt; margin-bottom: 3mm; }
+  .salutation .who { color: var(--accent); font-weight: 700; }
+  .salutation .adm { color: var(--label); font-weight: 600; font-size: 8.7pt; }
+
+  p.body-text { font-size: 9.7pt; line-height: 1.62; margin-bottom: 2.6mm; color: var(--body); text-align: justify; }
+  p.body-text strong { color: var(--body); }
+
+  /* ── ONE-LINE HIGHLIGHT STRIP ── */
+  .strip {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1mm 4mm;
+    background: var(--grey-bg); border-left: 3pt solid var(--accent);
+    padding: 2.4mm 4mm; margin-bottom: 3.4mm; font-size: 8.8pt;
+  }
+  .strip span b { color: var(--accent); }
+  .strip span.warn b { color: var(--red); }
+
+  .section-heading {
+    font-size: 5.8pt; font-weight: 700; color: #fff;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    background: var(--label);
+    display: inline-block; padding: 1mm 2.6mm;
+    border-radius: 2pt; margin-bottom: 2mm; margin-top: 1mm;
+  }
+
+  /* ── COMPACT BANK LINE ── */
+  .bank-line {
+    font-size: 9.3pt; line-height: 1.9; margin-bottom: 3mm;
+    padding: 2.4mm 4mm; background: var(--grey-bg); border-radius: 2pt;
+  }
+  .bank-line b { color: var(--label); font-weight: 700; }
+
+  .notice-bar {
+    border-radius: 0 3pt 3pt 0; padding: 3mm 4.5mm; margin-bottom: 2.8mm;
+    font-size: 8.8pt; line-height: 1.55;
+  }
+  .notice-bar.critical {
+    background: var(--red-bg); border-left: 4pt solid var(--red);
+    color: var(--red); font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: .3px;
+  }
+  .notice-bar.amber {
+    background: var(--amber-bg); border-left: 4pt solid var(--amber);
+    color: var(--body);
+  }
+
+  .signoff { margin-top: 3mm; font-size: 9.5pt; line-height: 1.7; }
+  .signoff .name { font-weight: 700; color: var(--body); }
+
+  ul.req-list { margin-left: 5mm; margin-bottom: 2mm; }
+  ul.req-list > li { font-size: 9.2pt; line-height: 1.85; color: var(--body); }
+  ol.req-sublist { margin-left: 5mm; margin-top: 1mm; margin-bottom: 1.5mm; }
+  ol.req-sublist li { font-size: 8.8pt; line-height: 1.75; color: var(--body); }
+
+  .eng-note { font-size: 8pt; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: .4px; margin-left: 1.5mm; }
+
+  @media print {
+    html, body { width: 210mm; margin: 0; padding: 0; background: #fff; }
+    .page { margin: 0; page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ PAGE 1 — ADMISSION LETTER ══════════════ -->
+<div class="page">
+  <div class="hdr">
+    <img src="https://www.riatirimbatvc.ac.ke/assets/logo-trans-CrKrf72f.png" class="hdr-img" alt="riatirimba tvc logo" />
+    <div class="hdr-center">
+      <div class="dept">Ministry of Education</div>
+      <div class="name">Riatirimba Technical and Vocational College</div>
+      <div class="contact">P.O. Box 25 – 40201 Gesusu &nbsp;·&nbsp; 0757 331 085 &nbsp;·&nbsp; info@riatirimbatvc.ac.ke</div>
+    </div>
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSg-XiBlvGvjI6ZOmtBgWlXKaALHvvbpjzrMen3uga_LTz4-55e5LClsGk&s=10" class="hdr-img" alt="ministry of education logo" />
+  </div>
+
+  <div class="title-band">
+    <span class="doc-title">Offer of Admission &amp; Joining Instructions</span>
+    <span class="receipt-no">ADM #<%= student.admissionNumber %></span>
+  </div>
+
+  <div class="salutation">
+    Dear <span class="who"><%= student.name %></span> &nbsp;<span class="adm">(Adm. No. <%= student.admissionNumber %>)</span>
+  </div>
+
+  <p class="body-text">
+    Following your application for admission to Riatirimba Technical and Vocational College (RTVC), we
+    are pleased to inform you that your application was successful. You have been offered a chance to
+    pursue studies in <strong><%= student.course %></strong> under the
+    <strong><%= student.department %></strong>.
+  </p>
+
+  <div class="strip">
+    <span>Registration: <b>01/09/2026</b>, 9:00 AM – 5:00 PM</span>
+    <span>Lectures Begin: <b>02/09/2026</b></span>
+    <span class="warn">Report-by Deadline: <b>17/09/2026</b></span>
+  </div>
+
+  <p class="body-text">
+    Those who will not have reported by the deadline above will be assumed to have no further interest
+    in the training programme and will therefore have forfeited the chance.
+  </p>
+
+  <div class="section-heading">Payment of Fees</div>
+  <p class="body-text">
+    <strong>All fees required for the academic year (see Page 2 for details)</strong> must be deposited
+    to the account below.
+  </p>
+  <div class="bank-line">
+    <b>Account Name:</b> Riatirimba Technical and Vocational College &nbsp;·&nbsp;
+    <b>Account No.:</b> 1283392763<br>
+    <b>Bank:</b> Kenya Commercial Bank (KCB) &nbsp;·&nbsp; <b>Branch:</b> Keroka
+  </div>
+
+  <div class="notice-bar critical">Admission fee once paid is non-refundable</div>
+
+  <div class="notice-bar amber">
+    <strong>NB:</strong> No cash will be accepted in the college. After making any payment, ensure that
+    you obtain an official receipt bearing the college stamp.
+  </div>
+
+  <p class="body-text">
+    The College does not allow any change of programmes midstream. Any request for change of programme
+    must therefore be made within the first two weeks after opening. Please see the requirements and
+    details in the appendices attached at the back of this letter.
+  </p>
+
+  <p class="body-text">
+    For any inquiry kindly visit the college. We look forward to seeing you join us and trust that you
+    will have a successful and memorable life here. Please make all efforts to meet the deadlines stated
+    in this letter.
+  </p>
+
+  <div class="signoff">
+    <em>Yours sincerely,</em><br>
+    <span class="name">Kawala J.O</span><br>
+    Principal / BOG Secretary
+  </div>
+</div>
+
+<!-- ══════════════ PAGE 2 — JOINING INSTRUCTIONS & REQUIREMENTS ══════════════ -->
+<div class="page">
+  <div class="hdr">
+    <img src="https://www.riatirimbatvc.ac.ke/assets/logo-trans-CrKrf72f.png" class="hdr-img" alt="riatirimba tvc logo" />
+    <div class="hdr-center">
+      <div class="dept">Ministry of Education</div>
+      <div class="name">Riatirimba Technical and Vocational College</div>
+      <div class="contact">P.O. Box 25 – 40201 Gesusu &nbsp;·&nbsp; 0757 331 085 &nbsp;·&nbsp; info@riatirimbatvc.ac.ke</div>
+    </div>
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSg-XiBlvGvjI6ZOmtBgWlXKaALHvvbpjzrMen3uga_LTz4-55e5LClsGk&s=10" class="hdr-img" alt="ministry of education logo" />
+  </div>
+
+  <div class="title-band">
+    <span class="doc-title">Joining Instructions &amp; Requirements</span>
+    <span class="receipt-no">ADM #<%= student.admissionNumber %></span>
+  </div>
+
+  <div class="section-heading">Joining Instructions</div>
+  <p class="body-text">
+    <strong>Stationery:</strong> Students must bring ruled papers, A4 exercise books, files, pens, and a
+    scientific calculator.
+  </p>
+  <p class="body-text">
+    <strong>Health:</strong> A medical examination must be completed by a certified healthcare
+    professional (Government Doctor or Registered Practitioner). The college provides only basic first
+    aid; trainees are responsible for external medical expenses and are encouraged to utilize SHIF
+    coverage.
+  </p>
+
+  <div class="section-heading">Requirements for Admission</div>
+  <ul class="req-list">
+    <li>
+      Copies and originals of:
+      <ol class="req-sublist">
+        <li>Birth Certificate</li>
+        <li>National ID</li>
+        <li>Leaving Certificates (Primary &amp; Secondary)</li>
+        <li>KCPE Result Slip</li>
+        <li>KCSE Certificate / Result Slip</li>
+      </ol>
+    </li>
+    <li>Two (2) coloured passport-size photographs</li>
+    <li>One (1) ream of printing paper</li>
+    <li>Four (4) spring files</li>
+
+    <% if (student.isEngineering) { %>
+    <li>
+      Engineering Specific Requirements <span class="eng-note">applies to this student</span>
+      <ol class="req-sublist">
+        <li>Navy-blue dust coat or overall</li>
+        <li>Safety boots</li>
+        <li>Technical drawing set and T-square</li>
+        <li>Scientific calculator (e.g. fx82MS, fx570ES PLUS)</li>
+      </ol>
+    </li>
+    <% } %>
+  </ul>
+</div>
+
+</body>
+</html>

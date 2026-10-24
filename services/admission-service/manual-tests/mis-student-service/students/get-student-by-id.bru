@@ -1,0 +1,15 @@
+meta {
+  name: get-student-by-id
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{address}}/students/62bd721d-03fb-4743-a295-1769fddb830a
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

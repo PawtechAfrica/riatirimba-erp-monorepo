@@ -1,0 +1,23 @@
+meta {
+  name: admin-erp-login
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:4005/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "principal@riatirimbatvc.ac.ke",
+    "password": "Principal@25"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

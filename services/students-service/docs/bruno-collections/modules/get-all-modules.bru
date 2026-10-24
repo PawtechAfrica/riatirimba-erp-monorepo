@@ -1,0 +1,17 @@
+meta {
+  name: get-all-modules
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{address}}/modules/enroll
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  forwardAuthorizationHeader: false
+}

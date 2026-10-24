@@ -1,0 +1,25 @@
+meta {
+  name: createa-applicant
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{address}}/applicants/new
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "firstName": "Joyner",
+    "lastName": "Lucas",
+    "phone": "0787234567",
+    "email": "lucas@gmail.com",
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,17 @@
+services:
+
+  backup-service:
+    image: tsungu/erp-backup-service:47665d0   # <-- Docker Hub image
+    container_name: backup-service
+    env_file: .env.backup
+    volumes:
+      - ./backup-service/backups:/app/backups
+      - ./backup-service/dbs.json:/app/dbs.json
+      - ./backup-service/rclone.conf:/root/.config/rclone/rclone.conf
+    networks:
+      - college-mis-network
+    restart: always
+
+networks:
+  college-mis-network:
+    driver: bridge
