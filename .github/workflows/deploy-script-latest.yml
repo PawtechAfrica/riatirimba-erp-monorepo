@@ -8,9 +8,9 @@ on:
         required: true
         type: choice
         options:
-          - all
-          - changed
-        default: all
+          - All
+          - Changed
+        default: All
 
   # Enable this later if you want automatic builds on pushes.
   # push:

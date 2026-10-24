@@ -646,8 +646,6 @@ const updateEnrollmentStatus = async (id, status, notes) => {
   return enrollment;
 };
 
-
-
 module.exports = {
   processEnrollmentEvent,
   getEnrollmentById,
