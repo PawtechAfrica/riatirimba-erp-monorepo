@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+# vps-status — quick, read-only Docker/VPS service overview.
+# Requirements: Bash and Docker CLI. Docker Compose plugin is optional.
+
+set -uo pipefail
+
+VERSION="1.0.0"
+COMPOSE_FILE="${VPS_COMPOSE_FILE:-}"
+PROJECT_DIRS=(
+  "/srv/riatirimba-erp"
+  "/srv/RIATIRIMBA-ERP"
+  "/srv/riatirimba-ERP"
+  "/srv/RIATIRIMBA-erp"
+)
+
+usage() {
+  cat <<'USAGE'
+vps-status — quick overview of Docker containers and ERP services
+
+Usage:
+  vps-status [--help] [--version]
+
+Optional environment variable:
+  VPS_COMPOSE_FILE=/path/to/compose.yml  Use a specific Compose file.
+
+Examples:
+  vps-status
+  VPS_COMPOSE_FILE=/srv/myapp/compose.yaml vps-status
+
+This command is read-only. It does not restart, deploy, or remove anything.
+USAGE
+}
+
+case "${1:-}" in
+  -h|--help) usage; exit 0 ;;
+  -V|--version) printf 'vps-status %s\n' "$VERSION"; exit 0 ;;
+  "") ;;
+  *) printf 'Unknown argument: %s\n\n' "$1" >&2; usage >&2; exit 2 ;;
+esac
+
+if ! command -v docker >/dev/null 2>&1; then
+  echo "ERROR: Docker CLI was not found. Install Docker or add it to PATH." >&2
+  exit 127
+fi
+
+if ! docker info >/dev/null 2>&1; then
+  cat >&2 <<'ERR'
+ERROR: Docker is unavailable or this user lacks permission to access it.
+Try: sudo vps-status
+Or add your account to the docker group (then sign out and back in).
+ERR
+  exit 1
+fi
+
+find_compose_file() {
+  if [[ -n "$COMPOSE_FILE" ]]; then
+    if [[ -f "$COMPOSE_FILE" ]]; then
+      return 0
+    fi
+    printf 'WARNING: VPS_COMPOSE_FILE was set but file was not found: %s\n' "$COMPOSE_FILE" >&2
+    return 1
+  fi
+
+  local dir candidate
+  for dir in "${PROJECT_DIRS[@]}" "$PWD"; do
+    for candidate in \
+      "$dir/compose.yml" "$dir/compose.yaml" \
+      "$dir/docker-compose.yml" "$dir/docker-compose.yaml"; do
+      if [[ -f "$candidate" ]]; then
+        COMPOSE_FILE="$candidate"
+        return 0
+      fi
+    done
+  done
+  return 1
+}
+
+line() { printf '%s\n' '------------------------------------------------------------------------'; }
+
+printf '\nVPS STATUS  |  %s\n' "$(date '+%Y-%m-%d %H:%M:%S %Z' 2>/dev/null || date)"
+line
+printf 'Host:       %s\n' "$(hostname 2>/dev/null || echo unknown)"
+printf 'User:       %s\n' "$(id -un 2>/dev/null || echo unknown)"
+printf 'Docker:     '
+docker --version 2>/dev/null || echo 'version unavailable'
+printf 'Engine:     '
+docker info --format '{{.ServerVersion}} ({{.OperatingSystem}})' 2>/dev/null || echo 'details unavailable'
+
+if command -v uptime >/dev/null 2>&1; then
+  printf 'Uptime:     %s\n' "$(uptime -p 2>/dev/null || uptime 2>/dev/null | sed 's/^[^,]*up /up /')"
+fi
+if command -v df >/dev/null 2>&1; then
+  printf '\nDisk usage (root filesystem):\n'
+  df -h / 2>/dev/null | awk 'NR==1 || NR==2 {print "  " $0}'
+fi
+if [[ -r /proc/meminfo ]]; then
+  awk '
+    /^MemTotal:/ {total=$2}
+    /^MemAvailable:/ {available=$2}
+    END {
+      if (total > 0 && available >= 0) {
+        used=total-available
+        printf "\nMemory:     %.1f GiB used / %.1f GiB total (%.0f%% used)\n", used/1048576, total/1048576, used*100/total
+      }
+    }
+  ' /proc/meminfo
+fi
+
+line
+printf 'ALL DOCKER CONTAINERS\n'
+line
+if ! docker ps -a --format 'table {{.Names}}\t{{.Status}}\t{{.Image}}' 2>/dev/null; then
+  echo 'Could not read Docker container list.'
+fi
+
+printf '\nCONTAINER COUNTS\n'
+all_count="$(docker ps -aq 2>/dev/null | wc -l | tr -d ' ')"
+running_count="$(docker ps -q 2>/dev/null | wc -l | tr -d ' ')"
+stopped_count=$(( ${all_count:-0} - ${running_count:-0} ))
+printf '  Total: %s | Running: %s | Not running: %s\n' "${all_count:-0}" "${running_count:-0}" "${stopped_count:-0}"
+
+if find_compose_file; then
+  printf '\nCOMPOSE PROJECT\n'
+  line
+  printf 'File: %s\n' "$COMPOSE_FILE"
+  if docker compose version >/dev/null 2>&1; then
+    compose_dir="$(cd "$(dirname "$COMPOSE_FILE")" 2>/dev/null && pwd)"
+    compose_base="$(basename "$COMPOSE_FILE")"
+    (cd "$compose_dir" && docker compose -f "$compose_base" ps -a) 2>&1 || \
+      echo 'WARNING: Could not read Compose project status.'
+  else
+    echo 'Docker Compose plugin not found; skipping Compose-specific status.'
+  fi
+else
+  printf '\nCompose file: not found in common ERP paths or current directory.\n'
+  printf 'If needed, set VPS_COMPOSE_FILE=/absolute/path/to/compose.yml\n'
+fi
+
+printf '\nNotes: This is a snapshot, not a continuous monitor. A running container is not\nguaranteed to mean its application is healthy. Check service logs for details.\n\n'

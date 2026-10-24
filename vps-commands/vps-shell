@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Standalone Compose discovery helpers (embedded in each command).
+COMPOSE_FILE=""
+COMPOSE_DIR=""
+
+vps_find_compose() {
+    local file
+    local -a candidates=()
+    # Optional override lets this command work with other VPS/project paths.
+    if [[ -n "${VPS_COMPOSE_FILE:-}" ]]; then
+        candidates+=("$VPS_COMPOSE_FILE")
+    fi
+    candidates+=(
+        /srv/riatirimba-erp/docker-compose.yml
+        /srv/riatirimba-erp/compose.yml
+        /srv/riatirimba-erp/compose.yaml
+        /srv/riatirimba-erp/docker-compose.yaml
+        /srv/RIATIRIMBA-ERP/docker-compose.yml
+        /srv/RIATIRIMBA-ERP/compose.yml
+        /srv/RIATIRIMBA-ERP/compose.yaml
+        /srv/RIATIRIMBA-ERP/docker-compose.yaml
+    )
+    for file in "${candidates[@]}"; do
+        if [[ -f "$file" ]]; then
+            COMPOSE_FILE="$(readlink -f "$file" 2>/dev/null || printf '%s' "$file")"
+            COMPOSE_DIR="$(dirname "$COMPOSE_FILE")"
+            return 0
+        fi
+    done
+    echo "ERROR: Could not find a Docker Compose file." >&2
+    echo "Set VPS_COMPOSE_FILE=/path/to/compose.yml and retry." >&2
+    return 1
+}
+
+vps_compose() {
+    (cd "$COMPOSE_DIR" && docker compose -f "$COMPOSE_FILE" "$@")
+}
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: vps-shell <service-name>"
+    echo
+    if vps_find_compose; then
+        vps_compose config --services
+    fi
+    exit 2
+fi
+
+# Normalize whitespace, format-control characters, and common alternate dashes.
+SERVICE="$(python3 -c '
+import sys, unicodedata
+s = sys.argv[1]
+s = s.translate(str.maketrans({
+    "\u2010": "-", "\u2011": "-", "\u2012": "-",
+    "\u2013": "-", "\u2014": "-", "\u2212": "-"
+}))
+s = "".join(c for c in s if unicodedata.category(c) != "Cf")
+print(s.strip())
+' "$1")"
+
+if [[ -z "$SERVICE" ]]; then
+    echo "ERROR: Service name is empty."
+    exit 2
+fi
+
+if ! vps_find_compose; then
+    exit 1
+fi
+
+SERVICES="$(vps_compose config --services)" || exit 1
+FOUND=false
+while IFS= read -r NAME; do
+    if [[ "$NAME" == "$SERVICE" ]]; then
+        FOUND=true
+        break
+    fi
+done <<< "$SERVICES"
+
+if [[ "$FOUND" != true ]]; then
+    echo "ERROR: Unknown service: [$SERVICE]"
+    if [[ "${VPS_SHELL_DEBUG:-0}" == "1" ]]; then
+        printf 'Input bytes: '
+        printf '%s' "$SERVICE" | od -An -tx1
+    fi
+    echo
+    echo "Available services:"
+    printf '%s\n' "$SERVICES"
+    echo
+    echo "Try: VPS_SHELL_DEBUG=1 vps-shell '<service-name>'"
+    exit 2
+fi
+
+CONTAINER="$(vps_compose ps -q "$SERVICE" | head -n 1)"
+
+if [[ -z "$CONTAINER" ]]; then
+    echo "ERROR: No running container found for '$SERVICE'."
+    echo "Check with: vps-diagnose $SERVICE"
+    exit 1
+fi
+
+if [[ "$(docker inspect -f '{{.State.Running}}' "$CONTAINER")" != "true" ]]; then
+    echo "ERROR: Container for '$SERVICE' is not running."
+    exit 1
+fi
+
+echo "Opening shell in service: $SERVICE"
+echo "Type 'exit' to return to the VPS."
+
+# Prefer sh for compatibility with minimal images such as Alpine.
+exec docker exec -it "$CONTAINER" sh

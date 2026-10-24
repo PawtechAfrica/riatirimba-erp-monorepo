@@ -397,7 +397,7 @@ const createOneTimeObligation = async (
     { id: 'VH-ADM', name: 'Admission Fee', amount: 500.00, priority: 1 },
     { id: 'VH-ID', name: 'Student ID', amount: 500.00, priority: 2 },
   ];
-
+//  
   for (const item of oneTimeData) {
     await ObligationVoteHeadSnapshot.create({
       id: generateSnapshotId(),

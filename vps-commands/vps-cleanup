@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+echo "======================================"
+echo "       RIATIRIMBA DOCKER CLEANUP"
+echo "======================================"
+echo "This removes stopped containers, dangling images, build cache,"
+echo "and unused networks. It does NOT remove volumes or tagged images."
+echo
+
+echo "---- Disk usage before ----"
+df -h /
+docker system df
+echo
+
+read -r -p "Continue with safe Docker cleanup? [y/N] " answer
+case "$answer" in
+    y|Y|yes|YES) ;;
+    *) echo "Cancelled."; exit 0 ;;
+esac
+
+echo
+echo "---- Removing stopped containers ----"
+docker container prune -f
+
+echo
+echo "---- Removing dangling images only ----"
+docker image prune -f
+
+echo
+echo "---- Removing unused build cache ----"
+docker builder prune -f
+
+echo
+echo "---- Removing unused networks ----"
+docker network prune -f
+
+echo
+echo "---- Disk usage after ----"
+df -h /
+docker system df
+
+echo
+echo "Cleanup complete. Docker volumes and tagged images were preserved."

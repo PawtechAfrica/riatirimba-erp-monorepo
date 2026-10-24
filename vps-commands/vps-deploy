@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Standalone Compose discovery helpers (embedded in each command).
+COMPOSE_FILE=""
+COMPOSE_DIR=""
+
+vps_find_compose() {
+    local file
+    local -a candidates=()
+    # Optional override lets this command work with other VPS/project paths.
+    if [[ -n "${VPS_COMPOSE_FILE:-}" ]]; then
+        candidates+=("$VPS_COMPOSE_FILE")
+    fi
+    candidates+=(
+        /srv/riatirimba-erp/docker-compose.yml
+        /srv/riatirimba-erp/compose.yml
+        /srv/riatirimba-erp/compose.yaml
+        /srv/riatirimba-erp/docker-compose.yaml
+        /srv/RIATIRIMBA-ERP/docker-compose.yml
+        /srv/RIATIRIMBA-ERP/compose.yml
+        /srv/RIATIRIMBA-ERP/compose.yaml
+        /srv/RIATIRIMBA-ERP/docker-compose.yaml
+    )
+    for file in "${candidates[@]}"; do
+        if [[ -f "$file" ]]; then
+            COMPOSE_FILE="$(readlink -f "$file" 2>/dev/null || printf '%s' "$file")"
+            COMPOSE_DIR="$(dirname "$COMPOSE_FILE")"
+            return 0
+        fi
+    done
+    echo "ERROR: Could not find a Docker Compose file." >&2
+    echo "Set VPS_COMPOSE_FILE=/path/to/compose.yml and retry." >&2
+    return 1
+}
+
+vps_compose() {
+    (cd "$COMPOSE_DIR" && docker compose -f "$COMPOSE_FILE" "$@")
+}
+
+usage() {
+    echo "Usage: vps-deploy <service-name> <new-image-tag>"
+}
+
+if [[ $# -ne 2 ]]; then
+    usage
+    exit 2
+fi
+
+SERVICE="$1"
+TAG="$2"
+
+if [[ ! "$SERVICE" =~ ^[a-zA-Z0-9][a-zA-Z0-9_.-]*$ ]]; then
+    echo "ERROR: Invalid service name."
+    exit 2
+fi
+
+if [[ ! "$TAG" =~ ^[a-zA-Z0-9_][a-zA-Z0-9_.-]*$ ]]; then
+    echo "ERROR: Invalid image tag."
+    exit 2
+fi
+
+if ! vps_find_compose; then
+    exit 1
+fi
+
+SERVICES="$(vps_compose config --services)" || exit 1
+if ! printf '%s\n' "$SERVICES" | grep -Fx -- "$SERVICE" >/dev/null; then
+    echo "ERROR: Unknown service: $SERVICE"
+    echo "Available services:"
+    printf '%s\n' "$SERVICES"
+    exit 2
+fi
+
+BACKUP="${COMPOSE_FILE}.backup.$(date +%Y%m%d-%H%M%S)"
+cp -p "$COMPOSE_FILE" "$BACKUP"
+
+# Replace only the image tag inside the requested top-level Compose service.
+if ! python3 - "$COMPOSE_FILE" "$SERVICE" "$TAG" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+path = Path(sys.argv[1])
+service = sys.argv[2]
+new_tag = sys.argv[3]
+text = path.read_text()
+
+lines = text.splitlines(keepends=True)
+services_index = None
+for i, line in enumerate(lines):
+    if re.match(r"^services:\s*(?:#.*)?$", line.rstrip("\r\n")):
+        services_index = i
+        break
+
+if services_index is None:
+    print("ERROR: Could not find top-level 'services:' in Compose file.", file=sys.stderr)
+    sys.exit(1)
+
+start = None
+end = len(lines)
+service_pattern = re.compile(r"^  " + re.escape(service) + r":\s*(?:#.*)?(?:\r?\n)?$")
+for i in range(services_index + 1, len(lines)):
+    line = lines[i]
+    if re.match(r"^  [A-Za-z0-9_.-]+:\s*(?:#.*)?(?:\r?\n)?$", line):
+        if start is not None:
+            end = i
+            break
+        if service_pattern.match(line):
+            start = i
+
+if start is None:
+    print(f"ERROR: Could not locate service block for {service}.", file=sys.stderr)
+    sys.exit(1)
+
+image_line = None
+for i in range(start + 1, end):
+    if re.match(r"^    image\s*:", lines[i]):
+        image_line = i
+        break
+
+if image_line is None:
+    print(f"ERROR: Service {service} has no simple 'image:' line.", file=sys.stderr)
+    print("This command does not support image values defined through YAML anchors or complex interpolation.", file=sys.stderr)
+    sys.exit(1)
+
+match = re.match(r"^(\s*image\s*:\s*)(['\"]?)([^'\"\s]+)\2(\s*(?:#.*)?(?:\r?\n)?)$", lines[image_line])
+if not match:
+    print(f"ERROR: Could not safely parse image line: {lines[image_line].rstrip()}", file=sys.stderr)
+    sys.exit(1)
+
+prefix, quote, image, suffix = match.groups()
+if "${" in image:
+    print("ERROR: Image uses variable interpolation; refusing to modify it.", file=sys.stderr)
+    sys.exit(1)
+
+# Preserve the repository/image name and replace its final tag.
+last_slash = image.rfind("/")
+last_colon = image.rfind(":")
+if last_colon > last_slash:
+    repository = image[:last_colon]
+else:
+    repository = image
+
+lines[image_line] = f"{prefix}{quote}{repository}:{new_tag}{quote}{suffix}"
+path.write_text("".join(lines))
+print(f"Updated image for {service}: {repository}:{new_tag}")
+PY
+then
+    cp -p "$BACKUP" "$COMPOSE_FILE"
+    echo "Compose file restored from backup."
+    exit 1
+fi
+
+echo "Compose backup: $BACKUP"
+echo
+
+echo "---- Validating Compose configuration ----"
+if ! vps_compose config -q; then
+    cp -p "$BACKUP" "$COMPOSE_FILE"
+    echo "Compose validation failed. Original file restored."
+    exit 1
+fi
+
+echo
+echo "---- Pulling requested image ----"
+if ! vps_compose pull "$SERVICE"; then
+    cp -p "$BACKUP" "$COMPOSE_FILE"
+    echo "Image pull failed. Original Compose file restored."
+    exit 1
+fi
+
+echo
+echo "---- Recreating only $SERVICE ----"
+if ! vps_compose up -d --no-deps --force-recreate "$SERVICE"; then
+    echo "WARNING: Deployment failed. Compose file remains on the requested tag."
+    echo "Backup available at: $BACKUP"
+    echo "Restore it manually if required, then redeploy the previous tag."
+    exit 1
+fi
+
+echo
+echo "---- Service status ----"
+vps_compose ps "$SERVICE"
+
+echo
+echo "---- Recent logs ----"
+vps_compose logs --tail=50 --timestamps "$SERVICE"
+
+echo
+echo "Deployment command completed."
