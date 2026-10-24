@@ -387,17 +387,15 @@ const createOneTimeObligation = async (
     student_year: enrollment.student_year,
     student_term: enrollment.student_term,
     obligation_type: 'one_time',
-    total_amount: 3550.00,
+    total_amount: 1000.00,
     total_paid: 0,
-    total_balance: 3550.00,
+    total_balance: 1000.00,
     status: 'unpaid',
   }, { transaction });
 
   const oneTimeData = [
     { id: 'VH-ADM', name: 'Admission Fee', amount: 500.00, priority: 1 },
     { id: 'VH-ID', name: 'Student ID', amount: 500.00, priority: 2 },
-    { id: 'VH-CAU', name: 'Caution Money', amount: 1000.00, priority: 3 },
-    { id: 'VH-KUC', name: 'KUCCPS Registration', amount: 1550.00, priority: 4 },
   ];
 
   for (const item of oneTimeData) {
