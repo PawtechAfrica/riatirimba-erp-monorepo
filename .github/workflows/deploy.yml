@@ -1,4 +1,4 @@
-name: Riatirimba ERP Uplink - September Build
+name: Retired:Riatirimba ERP Uplink
 
 on:
   workflow_dispatch:
