@@ -1,0 +1,233 @@
+name: Riatirimba ERP Uplink - September Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_scope:
+        description: "Choose which services to build"
+        required: true
+        type: choice
+        options:
+          - all
+          - changed
+        default: all
+
+  # Enable this later if you want automatic builds on pushes.
+  # push:
+  #   branches:
+  #     - main
+
+jobs:
+  smart-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed services
+        id: changed-services
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ALL_SERVICES="fees-service voucher-service academics-service admission-service auth-service excelerate-service filegate-service housekeeping-service reporting-service students-service"
+          CHANGED_SERVICES=""
+
+          echo "========================================"
+          echo "Event: $GITHUB_EVENT_NAME"
+          echo "Commit: $GITHUB_SHA"
+          echo "========================================"
+
+          # Manual deployments default to building every service.
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" && \
+                "${{ inputs.build_scope }}" == "all" ]]; then
+            CHANGED_SERVICES="$ALL_SERVICES"
+
+          else
+            # Determine the comparison base.
+            if [[ "$GITHUB_EVENT_NAME" == "push" && \
+                  -n "${{ github.event.before }}" && \
+                  "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]]; then
+              BASE="${{ github.event.before }}"
+            elif git rev-parse HEAD^ >/dev/null 2>&1; then
+              BASE="HEAD^"
+            else
+              echo "No previous commit available; building all services."
+              CHANGED_SERVICES="$ALL_SERVICES"
+              BASE=""
+            fi
+
+            if [[ -n "$BASE" ]]; then
+              echo "Comparing changes from $BASE to $GITHUB_SHA"
+
+              git diff --name-only "$BASE" "$GITHUB_SHA" \
+                | tee /tmp/changed-files.txt
+
+              # Shared root dependencies can affect multiple services.
+              if grep -qE \
+                '^(package\.json|package-lock\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|erp-sdk/)' \
+                /tmp/changed-files.txt; then
+                echo "Shared dependencies changed; rebuilding all services."
+                CHANGED_SERVICES="$ALL_SERVICES"
+              else
+                while IFS= read -r FILE; do
+                  case "$FILE" in
+                    services/finance-service/fees/*)
+                      CHANGED_SERVICES="$CHANGED_SERVICES fees-service"
+                      ;;
+                    services/finance-service/voucher/*)
+                      CHANGED_SERVICES="$CHANGED_SERVICES voucher-service"
+                      ;;
+                    services/academics-service/*)
+                      CHANGED_SERVICES="$CHANGED_SERVICES academics-service"
+                      ;;
+                    services/admission-service/*)
+                      CHANGED_SERVICES="$CHANGED_SERVICES admission-service"
+                      ;;
+                    services/auth-service/*)
+                      CHANGED_SERVICES="$CHANGED_SERVICES auth-service"
+                      ;;
+                    services/excelerate-service/*)
+                      CHANGED_SERVICES="$CHANGED_SERVICES excelerate-service"
+                      ;;
+                    services/filegate-service/*)
+                      CHANGED_SERVICES="$CHANGED_SERVICES filegate-service"
+                      ;;
+                    services/housekeeping-service/*)
+                      CHANGED_SERVICES="$CHANGED_SERVICES housekeeping-service"
+                      ;;
+                    services/reporting-service/*)
+                      CHANGED_SERVICES="$CHANGED_SERVICES reporting-service"
+                      ;;
+                    services/students-service/*)
+                      CHANGED_SERVICES="$CHANGED_SERVICES students-service"
+                      ;;
+                  esac
+                done < /tmp/changed-files.txt
+              fi
+            fi
+          fi
+
+          # Normalize and remove duplicate service names.
+          CHANGED_SERVICES=$(
+            printf '%s\n' "$CHANGED_SERVICES" |
+              tr ' ' '\n' |
+              sed '/^$/d' |
+              sort -u |
+              tr '\n' ' ' |
+              xargs
+          )
+
+          echo ""
+          echo "Services selected for build:"
+          echo "${CHANGED_SERVICES:-none}"
+
+          echo "CHANGED_SERVICES=$CHANGED_SERVICES" >> "$GITHUB_OUTPUT"
+
+      - name: Login to Docker Hub
+        if: steps.changed-services.outputs.CHANGED_SERVICES != ''
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push selected services
+        if: steps.changed-services.outputs.CHANGED_SERVICES != ''
+        shell: bash
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          CHANGED_SERVICES: ${{ steps.changed-services.outputs.CHANGED_SERVICES }}
+        run: |
+          set -euo pipefail
+
+          COMMIT_SHA="${GITHUB_SHA:0:7}"
+
+          for SERVICE in $CHANGED_SERVICES; do
+            IMAGE_NAME="erp-$SERVICE"
+
+            case "$SERVICE" in
+              fees-service)
+                DOCKERFILE_PATH="services/finance-service/fees/Dockerfile"
+                BUILD_CONTEXT="services/finance-service/fees"
+                ;;
+              voucher-service)
+                DOCKERFILE_PATH="services/finance-service/voucher/Dockerfile"
+                BUILD_CONTEXT="services/finance-service/voucher"
+                ;;
+              academics-service)
+                DOCKERFILE_PATH="services/academics-service/Dockerfile"
+                BUILD_CONTEXT="services/academics-service"
+                ;;
+              admission-service)
+                DOCKERFILE_PATH="services/admission-service/Dockerfile"
+                BUILD_CONTEXT="services/admission-service"
+                ;;
+              auth-service)
+                DOCKERFILE_PATH="services/auth-service/Dockerfile"
+                BUILD_CONTEXT="services/auth-service"
+                ;;
+              excelerate-service)
+                DOCKERFILE_PATH="services/excelerate-service/Dockerfile"
+                BUILD_CONTEXT="services/excelerate-service"
+                ;;
+              filegate-service)
+                DOCKERFILE_PATH="services/filegate-service/Dockerfile"
+                BUILD_CONTEXT="services/filegate-service"
+                ;;
+              housekeeping-service)
+                DOCKERFILE_PATH="services/housekeeping-service/Dockerfile"
+                BUILD_CONTEXT="services/housekeeping-service"
+                ;;
+              reporting-service)
+                DOCKERFILE_PATH="services/reporting-service/Dockerfile"
+                BUILD_CONTEXT="services/reporting-service"
+                ;;
+              students-service)
+                DOCKERFILE_PATH="services/students-service/Dockerfile"
+                BUILD_CONTEXT="services/students-service"
+                ;;
+              *)
+                echo "Unknown service: $SERVICE"
+                exit 1
+                ;;
+            esac
+
+            echo ""
+            echo "========================================"
+            echo "Service: $SERVICE"
+            echo "Image: $DOCKER_USERNAME/$IMAGE_NAME"
+            echo "Dockerfile: $DOCKERFILE_PATH"
+            echo "Build context: $BUILD_CONTEXT"
+            echo "========================================"
+
+            if [[ ! -f "$DOCKERFILE_PATH" ]]; then
+              echo "ERROR: Dockerfile not found: $DOCKERFILE_PATH"
+              exit 1
+            fi
+
+            if [[ ! -d "$BUILD_CONTEXT" ]]; then
+              echo "ERROR: Build context not found: $BUILD_CONTEXT"
+              exit 1
+            fi
+
+            docker build \
+              --progress=plain \
+              -f "$DOCKERFILE_PATH" \
+              -t "$DOCKER_USERNAME/$IMAGE_NAME:$COMMIT_SHA" \
+              -t "$DOCKER_USERNAME/$IMAGE_NAME:latest" \
+              "$BUILD_CONTEXT"
+
+            docker push "$DOCKER_USERNAME/$IMAGE_NAME:$COMMIT_SHA"
+            docker push "$DOCKER_USERNAME/$IMAGE_NAME:latest"
+
+            echo "Successfully built and pushed $SERVICE"
+          done
+
+      - name: No services selected
+        if: steps.changed-services.outputs.CHANGED_SERVICES == ''
+        run: |
+          echo "No service changes detected."
+          echo "Skipping Docker builds."
